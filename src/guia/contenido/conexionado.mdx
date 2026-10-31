@@ -1,0 +1,80 @@
+import { Ref } from '@/components/Cita'
+import { Aviso } from '@/components/guia/Aviso'
+import { EsquemaConexion, PracticarConexionado } from '@/components/guia/Conexionado'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+
+Conectar bien es que la luz prenda, pero también que sea **segura**: que la llave corte la fase, que cada masa tenga su PE y que cada cable tenga el color de su función. El inspector lo revisa borne por borne.
+
+## Luz con una llave de un punto
+
+<EsquemaConexion tipo="un-punto" />
+
+El recorrido, desde el tablero:
+
+1. **Fase** (marrón, negro o rojo): del tablero a un borne de la llave.
+2. **Retorno** (blanco): del otro borne de la llave al borne de fase del portalámparas.
+3. **Neutro** (celeste): directo del tablero a la lámpara, **sin pasar por la llave**.
+4. **PE** (verde-amarillo): directo del tablero a la masa del artefacto.
+
+Con la llave cerrada se cierra el circuito: fase → llave → retorno → lámpara → neutro. Por la fase, el retorno y el neutro circula la misma corriente; por el PE, ninguna, salvo que haya una falla.
+
+<Aviso tipo="cuidado">
+  **La llave va siempre sobre la fase.** Si corta el neutro, la luz se apaga igual, pero el
+  portalámparas queda con 220 V: el que cambia la lámpara con la llave «apagada» se puede llevar una
+  patada. Con un buscapolo se comprueba: con la llave abierta, en el portalámparas no tiene que
+  encender.
+</Aviso>
+
+Colores y secciones:
+
+- El retorno **no puede ser celeste, verde, amarillo ni verde-amarillo**. Lo indicado es otro color (el ERSeP usa blanco); por fuerza mayor se admite un color de fase, identificado en los dos extremos <Ref aea="770.10.3.8.5" />.
+- La alimentación y el retorno de las llaves pueden ser de **1 mm²** <Ref aea="Tabla 770.11.I" />. Algunos apuntes piden 1,5 mm² (ver [Conductores y colores](/guia/conductores-colores)).
+
+## Llave de combinación
+
+Sirve para prender y apagar **una misma luz desde dos lugares**: los dos extremos de un pasillo, el pie y el final de una escalera, la puerta y la cama. En **pasillos interiores de más de 3 m** son obligatorias, una en cada extremo <Ref aea="770.7.2" />.
+
+Cada llave de combinación tiene tres bornes: el **común** (C) y dos **viajeros**. El común se une a uno u otro viajero según la posición de la tecla.
+
+<EsquemaConexion tipo="combinacion" />
+
+1. **Fase** al común de la primera llave.
+2. **Dos viajeros** que unen los viajeros de una llave con los de la otra.
+3. **Retorno** del común de la segunda llave a la lámpara.
+4. **Neutro y PE** directos a la lámpara, como siempre.
+
+La luz prende cuando las dos llaves «apuntan» al mismo viajero. Por eso cualquiera de las dos, en cualquier posición, cambia el estado de la luz.
+
+<Aviso tipo="nota">
+  Para comandar desde **tres o más** lugares se agregan **llaves de cruce** (o intermedias) entre
+  las dos combinaciones, sobre los viajeros.
+</Aviso>
+
+## Tomacorriente
+
+Tres bornes: **fase**, **neutro** y **tierra**. En la inspección inicial se verifica, en **todos** los tomas, que el PE esté conectado a su borne de tierra y que la fase, el neutro y la protección estén cada uno en el borne destinado a él <Ref aea="770.19.3.1" />.
+
+Un toma **comandado por una llave** que esté a menos de 0,90 m del piso tiene que ser del **circuito de tomas**, no del de iluminación, y su llave no puede compartir la caja con llaves de iluminación <Ref aea="770.7.1 m)" />.
+
+## El PE también va a las bocas de luz
+
+El conductor de protección **recorre toda la instalación, incluso las cajas y bocas que no tienen tomacorrientes** <Ref aea="770.14.4.5" />:
+
+- **Artefacto metálico (clase I):** su masa se conecta al PE. Si se daña la aislación y la carcasa queda con tensión, la fuga va a tierra y salta el diferencial.
+- **Artefacto de doble aislación (clase II,** con el símbolo del doble cuadrado**):** no se conecta al PE, pero el PE igual tiene que llegar a la caja.
+- **Caja metálica:** también se conecta al PE, con una derivación, sin cortar el conductor que recorre la instalación <Ref aea="770.14.4.5" />.
+
+## Uniones y derivaciones
+
+- En cables de **menos de 4 mm²** se pueden unir hasta **4 conductores** intercalando y retorciendo las hebras; con **4 mm²**, hasta 3. Para más, **bornera** <Ref aea="770.10.3.8.3" />.
+- La unión se cubre con un aislante equivalente al del cable y **no puede quedar tirante** <Ref aea="770.10.3.8.3" />.
+
+## Practicá conectando
+
+Conectá cable por cable, accioná las llaves y verificá. El simulador detecta cortocircuitos, fugas a tierra, la llave en el neutro, la falta de PE y los colores fuera de norma.
+
+<PracticarConexionado escenario="un-punto">Luz con una llave</PracticarConexionado>
+<PracticarConexionado escenario="toma">Tomacorriente</PracticarConexionado>
+<PracticarConexionado escenario="combinacion">Luz con combinación</PracticarConexionado>
+
+<PracticaTema tipo="conceptos" tema="conexionado" />

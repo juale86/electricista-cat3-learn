@@ -795,6 +795,75 @@ export const PREGUNTAS: Pregunta[] = [
     explicacion: '220 · 3 / 100 = 6,6 V. Es la caída de tensión máxima en circuitos terminales.',
     fuente: manual('1.21'),
   },
+  {
+    tema: 'conexionado',
+    enunciado:
+      '¿Desde qué largo un pasillo interior tiene que llevar llaves de combinación en cada extremo?',
+    correcta: 'Más de 3 m',
+    incorrectas: ['Más de 5 m', 'Más de 2 m', 'Nunca es obligatorio'],
+    explicacion:
+      'En pasillos interiores de más de 3 m se prevén interruptores de combinación en cada extremo, para prender y apagar desde las dos puntas.',
+    fuente: aea('770.7.2'),
+  },
+  {
+    tema: 'conexionado',
+    enunciado: '¿Cuál es la sección mínima de los retornos de las llaves según la AEA 770?',
+    correcta: '1 mm²',
+    incorrectas: ['0,75 mm²', '2,5 mm²', '4 mm²'],
+    explicacion:
+      'La Tabla 770.11.I admite 1 mm² para alimentaciones y retornos de interruptores de efecto. Algunos apuntes basados en la AEA 771 piden 1,5 mm²; ante la duda, 1,5 mm² cumple las dos.',
+    fuente: aea('Tabla 770.11.I'),
+  },
+  {
+    tema: 'conexionado',
+    enunciado:
+      '¿Tiene que llegar el conductor de protección a una boca de techo que solo tiene una luz?',
+    correcta: 'Sí: el PE recorre toda la instalación, también las bocas sin tomas',
+    incorrectas: [
+      'No: el PE solo va a los tomacorrientes',
+      'Solo si la boca está en el baño',
+      'Solo si el circuito es TUG',
+    ],
+    explicacion:
+      'El PE recorre la instalación integralmente, incluyendo cajas y bocas sin tomacorrientes. Un artefacto metálico (clase I) conecta su masa a él; uno de doble aislación (clase II) no lo necesita, pero el PE igual tiene que estar en la caja.',
+    fuente: aea('770.14.4.5'),
+  },
+  {
+    tema: 'conexionado',
+    enunciado: '¿Cuántos cables de menos de 4 mm² se pueden unir retorciendo sus hebras?',
+    correcta: 'Hasta 4',
+    incorrectas: ['Hasta 2', 'Hasta 6', 'Sin límite, si se cubren con cinta'],
+    explicacion:
+      'Hasta cuatro conductores se pueden unir intercalando y retorciendo las hebras; para más hace falta una bornera. La unión se cubre con aislante equivalente al del cable y no puede quedar tirante.',
+    fuente: aea('770.10.3.8.3'),
+  },
+  {
+    tema: 'conexionado',
+    enunciado:
+      'Se quiere un toma comandado por una llave a 0,30 m del piso (por ejemplo, para una lámpara de pie). ¿De qué circuito tiene que ser?',
+    correcta: 'Del circuito de tomas (TUG)',
+    incorrectas: [
+      'Del circuito de iluminación (IUG)',
+      'De cualquiera de los dos',
+      'De un circuito de uso especial (TUE)',
+    ],
+    explicacion:
+      'No se permiten tomas del circuito de iluminación a menos de 0,90 m del piso. Si un toma comandado va más abajo, pertenece al circuito de tomas, y su llave no puede compartir la caja con llaves del circuito de iluminación.',
+    fuente: aea('770.7.1 m)'),
+  },
+  {
+    tema: 'conexionado',
+    enunciado: '¿Qué se verifica en todos los tomacorrientes en la inspección inicial?',
+    correcta: 'Que tengan el PE conectado y cada conductor en su borne',
+    incorrectas: [
+      'Solo que tengan tensión',
+      'Que estén a 1,20 m del piso',
+      'Que sean todos del mismo circuito',
+    ],
+    explicacion:
+      'La inspección visual pide comprobar en todos los tomas la conexión del conductor de protección a su borne de tierra y la correcta ubicación de la fase, el neutro y la protección.',
+    fuente: aea('770.19.3.1'),
+  },
 ]
 
 export function generarConceptos(tema?: string): Omit<Ejercicio, 'id'> {

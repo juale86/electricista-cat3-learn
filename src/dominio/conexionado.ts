@@ -59,7 +59,7 @@ export const ESCENARIOS: Escenario[] = [
     id: 'un-punto',
     nombre: 'Luz con una llave',
     consigna:
-      'Conectá la lámpara para que la prenda y la apague la llave. Usá los colores de la norma y no te olvides del PE.',
+      'Conectá la lámpara para que la prenda y la apague la llave. El artefacto es metálico (clase I), así que su masa va al PE. Usá los colores de la norma.',
     piezas: [
       { id: 'tablero', clase: 'tablero', nombre: 'Tablero (PIA C1)', x: 0, y: 260 },
       { id: 'lampara', clase: 'lampara', nombre: 'Boca de techo', x: 320, y: 0 },
@@ -79,7 +79,7 @@ export const ESCENARIOS: Escenario[] = [
     id: 'combinacion',
     nombre: 'Luz con combinación',
     consigna:
-      'Una luz que se prende y se apaga desde dos lugares (pasillo o escalera): cada llave tiene que cambiar el estado de la luz, sin importar cómo esté la otra.',
+      'Una luz que se prende y se apaga desde dos lugares (pasillo o escalera): cada llave tiene que cambiar el estado de la luz, sin importar cómo esté la otra. El artefacto es metálico (clase I): su masa va al PE.',
     piezas: [
       { id: 'tablero', clase: 'tablero', nombre: 'Tablero (PIA C1)', x: 0, y: 300 },
       { id: 'lampara', clase: 'lampara', nombre: 'Boca de techo', x: 330, y: 0 },
@@ -273,7 +273,9 @@ export function verificarConexionado(escenario: Escenario, cables: Cable[]): Hal
   for (const p of [...lamparas, ...tomas]) {
     if (!u.juntos(extremo(p.id, 'PE'), TIERRA))
       error(
-        `${p.nombre}: falta el conductor de protección (PE). Recorre toda la instalación, también las bocas de luz.`,
+        p.clase === 'toma'
+          ? `${p.nombre}: falta el conductor de protección (PE) en el borne de tierra del toma.`
+          : `${p.nombre}: falta el conductor de protección (PE). Recorre toda la instalación, también las bocas de luz, y un artefacto metálico (clase I) lleva su masa conectada a él.`,
         aea(p.clase === 'toma' ? '770.19.3.1' : '770.14.4.5'),
       )
   }
