@@ -1,0 +1,66 @@
+import { Ref } from '@/components/Cita'
+import { Aviso } from '@/components/guia/Aviso'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+
+Los cables unipolares van siempre protegidos dentro de caños o cablecanales. El caño tiene que tener lugar para que los cables no se calienten y se puedan sacar y volver a pasar.
+
+## Tipos de caño
+
+| Tipo                          | Sigla en el plano | Dónde se usa                      |
+| ----------------------------- | ----------------- | --------------------------------- |
+| Metálico liviano o semipesado | RL, RS            | Embutido o a la vista             |
+| Aislante rígido (PVC)         | RP, RSP           | Embutido o a la vista             |
+| Aislante corrugado            | CL, CSP           | Embutido en mampostería o en losa |
+
+El número después de la sigla es el **diámetro** en milímetros: un **RP20** es un caño rígido de PVC de 20 mm. En la carpeta del ERSeP se anota, por ejemplo, `2x2.5 + T pR 20`: dos cables de 2,5 mm² más el de tierra, en caño rígido de 20 mm <Ref carpeta />.
+
+## Diámetros mínimos
+
+- **Circuitos terminales** (IUG, TUG, TUE): diámetro interno de **13 mm** o más, o sea caño de 16.
+- **Línea principal y circuitos seccionales:** **15 mm** o más, o sea caño de 19 o 20.
+
+Fuente: <Ref aea="770.10.3.8.4" />.
+
+## ¿Cuántos cables entran?
+
+La regla general: el área de los cables, **con su aislación**, no puede pasar del **35 %** de la sección interna del caño <Ref aea="770.10.3.8.4" />. Para no hacer la cuenta, la norma trae tablas por tipo de caño. Algunos valores para caño rígido de PVC:
+
+| Caño | 1,5 mm² | 2,5 mm² | 4 mm²   |
+| ---- | ------- | ------- | ------- |
+| RP16 | 4 + PE  | 2 + PE  | —       |
+| RP20 | 7 + PE  | 4 + PE  | 3 + PE  |
+| RP25 | 13 + PE | 9 + PE  | 6 + PE  |
+| RP32 | —       | 15 + PE | 11 + PE |
+
+Fuente: <Ref aea="Tabla 770.10.VIII" />. El número es la cantidad de cables de fase, neutro y retornos; el PE se suma aparte. Hay tablas equivalentes para caño metálico <Ref aea="Tabla 770.10.VII" /> y corrugado <Ref aea="Tabla 770.10.IX" />.
+
+<Aviso tipo="cuidado">
+  Si el caño es **corrugado por dentro**, se usa la medida **inmediata superior** a la del caño
+  liso. Y si los cables son de más de 2,5 mm², el PE se cuenta como si fuera de la misma sección que
+  la fase.
+</Aviso>
+
+## Recorridos y curvas
+
+- Como máximo **3 curvas entre dos cajas** <Ref aea="770.10.3.1" />. Si hacen falta más, se pone una caja de paso en el medio.
+- Los recorridos embutidos y a la vista siguen **líneas verticales y horizontales**, paralelas a las aristas de las paredes <Ref aea="770.10.3.1" />. Así se sabe por dónde pasan y nadie los perfora.
+- En un caño **metálico** no se puede pasar **un solo** cable unipolar: siempre van ida y vuelta juntos <Ref aea="770.10.3.8.4" />.
+
+## Cajas
+
+La caja tiene que tener lugar para los cables y los dispositivos. La norma da el volumen útil de cada caja y lo que ocupa cada cosa <Ref aea="Tabla 770.10.X" />:
+
+| Caja               | Volumen útil |
+| ------------------ | ------------ |
+| Rectangular 5 × 10 | 120 cm³      |
+| Cuadrada 10 × 10   | 200 cm³      |
+| Octogonal grande   | 120 cm³      |
+| Octogonal chica    | 75 cm³       |
+
+Cada cable de 1,5 mm² ocupa unos **6 cm³** y cada uno de 2,5 mm², **8,5 cm³**. Un toma de 10 A ocupa entre 18 y 38 cm³, según el modelo.
+
+<Aviso tipo="atajo">
+  En una caja rectangular **5 × 10** entran como máximo **2 tomas**, y en una **10 × 10**, 4 tomas.
+</Aviso>
+
+<PracticaTema tipo="conceptos" tema="canalizaciones" />

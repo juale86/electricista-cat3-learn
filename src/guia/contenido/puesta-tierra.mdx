@@ -1,0 +1,62 @@
+import { Ref } from '@/components/Cita'
+import { Aviso, Formula } from '@/components/guia/Aviso'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+
+La puesta a tierra le da a la corriente de falla un camino seguro. Si un cable pelado toca la carcasa de un lavarropas, la corriente se va por el PE a tierra, el diferencial la detecta y corta, y nadie recibe la descarga.
+
+## Esquema TT
+
+En las viviendas se usa el esquema **TT** <Ref aea="770.3.2" />:
+
+- La primera **T**: el neutro de la red está puesto a tierra por la distribuidora (**tierra de servicio**).
+- La segunda **T**: las masas de la casa van a una **tierra de protección propia**, independiente, dentro del terreno.
+
+Las dos tierras tienen que estar **lejos** entre sí: a más de 10 veces el radio equivalente de la jabalina, unos **3 a 6 m** según su tamaño <Ref aea="Tabla 770.3.I" />.
+
+<Aviso tipo="cuidado">
+  **Nunca** se une el neutro con el PE dentro de la casa. En TT son dos cosas distintas: el neutro
+  lleva corriente siempre, el PE solo cuando hay una falla. Si se unen, el diferencial salta o,
+  peor, deja de proteger.
+</Aviso>
+
+## Las partes
+
+1. **Jabalina:** barra de acero recubierta de cobre (IRAM 2309) clavada en el suelo. En la carpeta del ERSeP es de 1,5 m <Ref carpeta />.
+2. **Cámara de inspección:** caja con tapa a nivel del piso, para poder ver y medir la conexión. Es **obligatoria** <Ref aea="770.14.4.3" />. Con una sola jabalina se usa un **tomacable** (IRAM 2343).
+3. **Cable de puesta a tierra:** de la jabalina a la barra de tierra del tablero principal. **4 mm² o más**; la carpeta usa 6 mm² <Ref aea="Tabla 770.14.I" />.
+4. **Barra de tierra del tablero**, de donde sale el PE de cada circuito.
+5. **Conductor de protección (PE):** verde-amarillo, recorre **toda** la instalación y llega al borne de tierra de cada toma y a cada masa metálica.
+
+## El conductor de protección (PE)
+
+- Sección: **igual a la de la fase** hasta 16 mm², con un **mínimo de 2,5 mm²** <Ref aea="Tabla 770.14.I" />.
+- Pasa por **todas las cajas**, aunque no tengan tomas.
+- **No se corta:** se deriva hacia cada borne sin interrumpir el cable principal. **Está prohibido conectar las masas en serie** («en guirnalda») <Ref aea="770.14.4.5" />. Si se suelta una, las siguientes quedan sin tierra.
+- Todos los caños, cajas y gabinetes metálicos se conectan al PE <Ref aea="770.14.4.6" />.
+
+## Cuánto tiene que medir
+
+<Formula aea="770.3.2">Ra ≤ 40 Ω</Formula>
+
+Con Ra de 40 Ω o menos y diferenciales de **hasta 300 mA**, la norma considera el circuito protegido contra contactos indirectos: una masa con falla no llega a los **24 V** de tensión límite de contacto antes de que el diferencial corte.
+
+<Formula aea="770.14.3.2">Ra × IΔn ≤ 24 V → 40 Ω × 0,3 A = 12 V</Formula>
+
+Con el diferencial de 30 mA de los circuitos terminales el margen es todavía mayor (40 Ω × 0,03 A = 1,2 V).
+
+<Aviso tipo="nota">
+  La carpeta modelo del ERSeP dice «32 Ω, menor a los 40 Ω **mínimos**». Es un error de redacción:
+  **40 Ω es el máximo**.
+</Aviso>
+
+## Cómo se mide
+
+Preferentemente con un **telurímetro**. La norma también describe el método de los **3 electrodos** <Ref aea="770.19.5.3" />:
+
+1. En la cámara de inspección se desconecta la jabalina de la instalación, para medir solo la jabalina (práctica habitual).
+2. Se clavan dos electrodos auxiliares en línea recta: uno lejos (corriente) y otro al **62 %** de esa distancia (tensión).
+3. Se mide, y se repite moviendo el electrodo de tensión **1 m para cada lado**. Si los tres valores son parecidos, la medición es buena.
+
+Si da más de 40 Ω se agregan jabalinas o se usa una más larga. Ver también **Mediciones** en Fundamentos.
+
+<PracticaTema tipo="conceptos" tema="puesta-tierra" />

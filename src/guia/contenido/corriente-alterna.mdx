@@ -1,0 +1,65 @@
+import { Ref } from '@/components/Cita'
+import { Aviso, Formula } from '@/components/guia/Aviso'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+import { OndaSenoidal } from '@/components/guia/SimuladoresFundamentos'
+
+## Continua y alterna
+
+- **Corriente continua (CC):** circula siempre en el mismo sentido. Pilas, baterías, paneles solares, fuentes de los equipos electrónicos.
+- **Corriente alterna (CA):** cambia de sentido muchas veces por segundo. Es la que llega a las casas por la red.
+
+## La onda de la red
+
+<OndaSenoidal />
+
+| Concepto            | Valor en Argentina                               |
+| ------------------- | ------------------------------------------------ |
+| Frecuencia (f)      | **50 Hz**: 50 ciclos por segundo                 |
+| Período (T = 1 / f) | **20 ms** por ciclo                              |
+| Tensión eficaz      | **220 V**: la que se usa para todos los cálculos |
+| Tensión máxima      | 220 · √2 ≈ **311 V**                             |
+
+<Aviso tipo="nota">
+  Cuando se dice "220 V" siempre es el valor **eficaz**: el que produce el mismo calor que 220 V de
+  continua. Los instrumentos comunes miden el valor eficaz.
+</Aviso>
+
+## Monofásica y trifásica
+
+- **Monofásica:** una fase y el neutro. Entre ellos hay **220 V**. Es lo que tienen la mayoría de las viviendas.
+- **Trifásica:** tres fases (R, S, T) y el neutro. Entre una fase y el neutro hay 220 V; **entre dos fases hay 380 V** (220 · √3). Se usa en edificios, comercios con motores grandes e industrias.
+
+<Formula leyenda="Relación entre tensión de línea y de fase">
+  U línea = √3 · U fase → 380 V ≈ 1,73 · 220 V
+</Formula>
+
+Colores de las fases: **R marrón, S negro, T rojo**; neutro **celeste**; protección **verde-amarillo**.
+
+## Tipos de carga y cos φ
+
+| Carga               | Ejemplos                                                             | cos φ                  |
+| ------------------- | -------------------------------------------------------------------- | ---------------------- |
+| Resistiva           | Termotanque, pava, horno, estufa de cuarzo                           | 1                      |
+| Inductiva (bobinas) | Motores, aire acondicionado, bombas, balastos de tubos fluorescentes | menor que 1            |
+| Capacitiva          | Capacitores de corrección                                            | menor que 1 (adelanta) |
+
+En las cargas inductivas, la corriente se atrasa respecto de la tensión. Aparecen tres potencias, que forman el **triángulo de potencias**:
+
+| Potencia | Símbolo | Unidad | Qué es                                        |
+| -------- | ------- | ------ | --------------------------------------------- |
+| Activa   | P       | W      | La que se transforma en trabajo útil          |
+| Reactiva | Q       | VAr    | La que va y viene para magnetizar las bobinas |
+| Aparente | S       | VA     | La que circula por los cables: S = √(P² + Q²) |
+
+<Formula>cos φ = P / S</Formula>
+
+<Aviso tipo="norma">
+  Un **cos φ bajo** hace circular más corriente para la misma potencia útil: los cables se cargan
+  más. Para declarar los kW en el certificado, el ERSeP toma un factor de potencia mínimo de
+  **0,85** (RG ERSeP 50/2017, según la <Ref carpeta />
+  ).
+</Aviso>
+
+Los cálculos con cos φ están en el tema **Corriente desde la potencia** del bloque Cálculos.
+
+<PracticaTema tipo="conceptos" tema="corriente-alterna" />

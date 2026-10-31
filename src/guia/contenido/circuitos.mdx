@@ -1,0 +1,60 @@
+import { Ref } from '@/components/Cita'
+import { Aviso } from '@/components/guia/Aviso'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+import { TablaCircuitos } from '@/components/guia/Tablas'
+
+Una casa no se alimenta con un solo circuito: se divide para que una falla deje sin servicio solo una parte y para que cada cable lleve la corriente que puede. Este tema explica **qué tipos de circuito hay y qué va en cada uno**. Cuántos circuitos hacen falta según la superficie se ve en **Grado de electrificación y DPMS**, en el bloque Cálculos.
+
+## Tipos de circuito
+
+<TablaCircuitos />
+
+- **IUG (iluminación de uso general):** bocas de luz, ventiladores y extractores de techo. Puede tener algún toma (boca mixta), pero entonces el cable pasa a 2,5 mm².
+- **TUG (tomacorrientes de uso general):** tomas de 10 A para cargas comunes: televisor, heladera, cargadores, licuadora.
+- **TUE (tomacorrientes de uso especial):** tomas de 20 A para cargas grandes: aire acondicionado, horno eléctrico, termotanque.
+
+Reglas comunes <Ref aea="Tabla 770.6.I" />:
+
+- Todos los circuitos son **por lo menos bifilares** (fase y neutro) <Ref aea="770.6.1" />, y los de uso general son **monofásicos**.
+- Como máximo **15 bocas** por circuito.
+- El calibre del PIA nunca puede superar el máximo del tipo de circuito, aunque el cable aguante más.
+
+<Aviso tipo="nota">
+  Las siglas **MBTF** (timbres, porteros) y **MBTS** (muy baja tensión de seguridad, para mandos en
+  tanques o cisternas) son circuitos de **uso específico**. Se ven en **Locales especiales**.
+</Aviso>
+
+## Puntos mínimos por ambiente
+
+Además de la cantidad de circuitos, la norma fija **cuántas bocas** tiene que tener cada ambiente como mínimo. Algunos valores que valen para todos los grados:
+
+| Ambiente                      | Bocas de luz (IUG)      | Tomas (TUG)            |
+| ----------------------------- | ----------------------- | ---------------------- |
+| Estar, comedor, escritorio    | 1 cada 18 m² (mínimo 1) | 1 cada 6 m² (mínimo 2) |
+| Dormitorio de menos de 10 m²  | 1                       | 2                      |
+| Dormitorio de 10 a 36 m²      | 1                       | 3                      |
+| Baño                          | 1                       | 1                      |
+| Balcón, galería, semicubierto | 1 cada 5 m de largo     | —                      |
+
+En la **cocina** el mínimo depende del grado: en grado mínimo, **1 boca de luz y 3 tomas**, más **2 tomas para artefactos fijos**. Fuente: <Ref aea="Tabla 770.7.III" />.
+
+<Aviso tipo="atajo">
+  Las fracciones se redondean **para arriba**: un comedor de 20 m² necesita 2 bocas de luz (20 / 18
+  = 1,1) y 4 tomas (20 / 6 = 3,3).
+</Aviso>
+
+## Alturas y tomas
+
+- Los tomas sobre el zócalo van con el **borde inferior de la caja entre 0,20 m y 0,30 m** del piso terminado <Ref aea="770.7.2" />.
+- Los tomas a **menos de 0,90 m** del piso tienen que ser **2 × 10 A + T (IRAM 2071) con pantalla** que impide meter objetos <Ref aea="770.7.2" />. Es una protección para los chicos.
+- **No se puede conectar al circuito de iluminación un toma a menos de 0,90 m del piso** <Ref aea="770.7.1 m)" />.
+
+<Aviso tipo="cuidado">
+  La carpeta modelo del ERSeP dibuja los tomas a **0,40 m** (y la leyenda del plano dice 0,30 m).
+  Para el examen conviene saber el valor de la norma (**0,20 a 0,30 m**) y preguntar en el curso
+  cuál toman.
+</Aviso>
+
+En el plano de la carpeta del ERSeP las llaves y los pulsadores van a **1,10 m** y las bocas de luz de pared a **2,20 m** <Ref carpeta />.
+
+<PracticaTema tipo="conceptos" tema="circuitos" />

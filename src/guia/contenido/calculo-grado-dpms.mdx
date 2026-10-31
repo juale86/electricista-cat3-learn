@@ -1,0 +1,93 @@
+import { Ref } from '@/components/Cita'
+import { Aviso, Formula } from '@/components/guia/Aviso'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+import { TablaGrados } from '@/components/guia/Tablas'
+
+Antes de dibujar un solo circuito hay que saber **cuánta instalación necesita la vivienda**. La AEA 770 lo resuelve con el **grado de electrificación**, que sale de la superficie, y con la **demanda de potencia máxima simultánea (DPMS)**, que dimensiona la línea principal y la protección de cabecera.
+
+## 1. Superficie límite
+
+<Formula aea="770.7.3">S límite = S cubierta + 0,5 · S semicubierta</Formula>
+
+Los semicubiertos (galerías, cocheras abiertas) **cuentan la mitad**.
+
+**Ejemplo:** 80 m² cubiertos + 20 m² de galería → 80 + 10 = **90 m²**.
+
+## 2. Grado de electrificación
+
+<TablaGrados />
+
+<Aviso tipo="norma">
+  Si una vivienda de menos de 130 m² tiene un dormitorio de más de 36 m², los **puntos mínimos** se
+  toman del grado elevado (Nota 1 de <Ref aea="770.7.5" />
+  ).
+</Aviso>
+
+## 3. Circuitos mínimos
+
+En la 770, los circuitos mínimos son **solo de uso general** (IUG y TUG):
+
+| Grado    | Circuitos | Combinación IUG / TUG                  |
+| -------- | --------- | -------------------------------------- |
+| Mínimo   | 2         | 1 / 1                                  |
+| Medio    | 3         | 2 / 1 o 1 / 2                          |
+| Elevado  | 5         | 2 / 3 o 3 / 2                          |
+| Superior | 6         | 2 / 3 o 3 / 2, más 1 de libre elección |
+
+Se pueden agregar más circuitos (por ejemplo, un TUE para el aire acondicionado); estos son los **mínimos**.
+
+## 4. DPMS de cada circuito
+
+Cada circuito aporta un valor mínimo de demanda (<Ref aea="Tabla 770.8.I" />):
+
+| Circuito                | DPMS mínima         |
+| ----------------------- | ------------------- |
+| IUG sin tomas           | 2/3 · bocas · 60 VA |
+| IUG con tomas derivados | 2200 VA             |
+| TUG                     | 2200 VA             |
+| TUE                     | 3300 VA             |
+
+Si conocés los consumos reales y son mayores, se usan los reales.
+
+## 5. Coeficiente de simultaneidad
+
+No todo funciona a la vez, así que la suma se multiplica por un coeficiente que depende del grado (ver la tabla de arriba): **1 · 0,8 · 0,7 · 0,6**.
+
+<Formula aea="770.8.3.1">
+  DPMS = Σ circuitos de uso general · coeficiente + circuitos específicos
+</Formula>
+
+Los circuitos de **uso específico** (ACU, APM, MBTF…) se suman **aparte**, sin el coeficiente.
+
+## Ejemplo completo
+
+Vivienda de 72 m² cubiertos → **grado medio**. Circuitos: 2 IUG sin tomas (8 y 6 bocas), 1 TUG y 1 TUE.
+
+- IUG: 2/3 · 14 bocas · 60 VA = **560 VA**
+- TUG: **2200 VA**
+- TUE: **3300 VA**
+- Suma = 6060 VA → DPMS = 6060 · 0,8 = **4848 VA**
+- Corriente de la línea principal: 4848 / 220 ≈ **22 A**
+
+<Aviso tipo="atajo">
+  2/3 de 60 VA son **40 VA por boca** de iluminación: multiplicá las bocas por 40 y listo.
+</Aviso>
+
+<Aviso tipo="nota" titulo="Diferencia con el manual del curso">
+  El manual sigue la AEA 771 (2006): **150 VA por boca** (al 66 %) y coeficientes **1 · 0,9 · 0,8 ·
+  0,7**. Con esos valores, el ejemplo daría más demanda. Ver <Ref manual="4.1, Tablas 38 y 39" />.
+  La <Ref carpeta /> ya calcula con la 770.
+</Aviso>
+
+## Errores típicos
+
+<Aviso tipo="cuidado">
+
+- Sumar la semicubierta completa en vez de la mitad.
+- Aplicar el coeficiente de simultaneidad a los circuitos de uso específico.
+- Usar el coeficiente según la cantidad real de circuitos: va según el **grado**.
+- Contar 60 VA por boca sin el 2/3.
+
+</Aviso>
+
+<PracticaTema tipo="grado" />

@@ -1,0 +1,53 @@
+import { Aviso, Formula } from '@/components/guia/Aviso'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+import { SimuladorEnergia } from '@/components/guia/SimuladoresFundamentos'
+
+**Potencia** es cuánto trabajo hace un aparato por segundo. **Energía** es la potencia acumulada en el tiempo: lo que marca el medidor y cobra la distribuidora.
+
+## Potencia
+
+<Formula leyenda="En cargas resistivas (con cos φ = 1)">P = U · I</Formula>
+
+Se mide en **watt (W)**. 1 kW = 1000 W.
+
+**Ejemplo:** una pava que consume 9 A en 220 V → P = 220 · 9 = **1980 W ≈ 2 kW**.
+
+<Aviso tipo="atajo">
+  En 220 V, **1 A ≈ 220 W** y **1 kW ≈ 4,5 A**. Con eso estimás de cabeza cuánto consume cualquier
+  aparato.
+</Aviso>
+
+## Energía
+
+<Formula leyenda="P en kW · t en horas">E [kWh] = P [kW] · t [h]</Formula>
+
+**1 kWh** es la energía de un aparato de 1000 W funcionando 1 hora. También es 100 W durante 10 horas.
+
+**Ejemplo:** termotanque de 2000 W, 3 horas por día, 30 días → 2 kW · 90 h = **180 kWh** por mes.
+
+<SimuladorEnergia />
+
+## Efecto Joule: por qué se calientan los cables
+
+Toda corriente que pasa por una resistencia produce calor:
+
+<Formula>P = I² · R</Formula>
+
+Como la corriente está **al cuadrado**, el doble de corriente produce **cuatro veces** más calor. Esto explica dos cosas que vas a ver en obra:
+
+- Un cable de sección chica con mucha corriente se recalienta: por eso la sección se elige según la corriente.
+- Un **empalme flojo** o mal hecho tiene más resistencia de contacto y se calienta, aunque el cable esté bien dimensionado. Es una causa común de incendios.
+
+<Aviso tipo="cuidado">
+  Las uniones mal hechas se calientan, se ennegrecen y derriten la aislación. Por eso la norma
+  limita los empalmes con hebras retorcidas y pide borneras o manguitos en secciones grandes.
+</Aviso>
+
+## Potencia instalada y factura
+
+- **Potencia instalada:** la suma de las potencias de todo lo que se puede conectar. No funciona todo junto, por eso para dimensionar se usa la **demanda simultánea** (DPMS, ver el bloque de Cálculos).
+- **La factura de EPEC** cobra la **energía en kWh**, más cargos fijos e impuestos. Para bajar el consumo hay que reducir la potencia o las horas de uso.
+
+<PracticaTema tipo="energia" />
+
+<PracticaTema tipo="conceptos" tema="potencia-energia" />

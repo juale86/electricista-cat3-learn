@@ -1,0 +1,66 @@
+import { Aviso, Formula } from '@/components/guia/Aviso'
+import { SimuladorCorriente } from '@/components/guia/Simuladores'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+
+Casi todas las decisiones de una instalación arrancan por la **corriente**: con ella se elige la sección del cable, el calibre del termomagnético y se calcula la caída de tensión. Lo que normalmente conocés es la **potencia** del aparato (viene en la chapa o en el manual), así que el primer paso es pasar de potencia a corriente.
+
+## Potencia activa, aparente y cos φ
+
+- **Potencia activa (P)**, en watts (W): la que realmente se convierte en calor, luz o movimiento. Es la que figura en la mayoría de los aparatos.
+- **Potencia aparente (S)**, en voltampere (VA): la que "ve" la instalación. Es la que se usa para dimensionar cables y protecciones.
+- **Factor de potencia (cos φ)**: la relación entre las dos, `P = S · cos φ`.
+
+En cargas **resistivas** (termotanque, pava, horno, estufa de cuarzo) el cos φ es **1**: watts y VA son lo mismo. En cargas con **motores o bobinas** (aire acondicionado, bomba, lavarropas, heladera) el cos φ es menor que 1, y la corriente es **más grande** que la que darías dividiendo solo por la tensión.
+
+## Monofásica (220 V)
+
+<Formula leyenda="P en W · U = 220 V · I en A">I = P / (U · cos φ)</Formula>
+
+**Ejemplo:** termotanque de 2000 W (resistivo, cos φ = 1).
+
+I = 2000 / (220 · 1) = **9,1 A**
+
+**Ejemplo:** aire acondicionado de 1500 W con cos φ = 0,85.
+
+I = 1500 / (220 · 0,85) = **8,0 A** (si te olvidás del cos φ te da 6,8 A y te quedás corto)
+
+## Trifásica (3 × 380 V)
+
+En trifásica la tensión entre fases es 380 V, y aparece el factor **√3 ≈ 1,732** porque la potencia se reparte entre las tres fases.
+
+<Formula leyenda="U = 380 V (tensión de línea)">I = P / (√3 · U · cos φ)</Formula>
+
+**Ejemplo:** motor trifásico de 4 kW con cos φ = 0,85.
+
+I = 4000 / (1,732 · 380 · 0,85) = **7,15 A** por fase
+
+<Aviso tipo="nota">
+  ¿De dónde sale el √3? La tensión entre dos fases (380 V) es √3 veces la tensión entre fase y
+  neutro (220 V): 220 · 1,732 ≈ 380 V.
+</Aviso>
+
+## Atajos para calcular rápido
+
+<Aviso tipo="atajo">
+
+- **Monofásica, carga resistiva:** cada kW son **≈ 4,5 A** (1000 / 220 = 4,55). Ej.: 2,2 kW → 2,2 × 4,5 ≈ 10 A.
+- **Monofásica con cos φ:** sacá la corriente resistiva y dividila por el cos φ. Ej.: 1,5 kW con 0,85 → 6,8 / 0,85 ≈ 8 A.
+- **Trifásica, cos φ 0,85 (motores):** cada kW son **≈ 1,8 A**. Ej.: 5,5 kW → 5,5 × 1,8 ≈ 10 A.
+- **Trifásica, cos φ 1:** cada kW son **≈ 1,5 A**.
+
+</Aviso>
+
+## Errores típicos
+
+<Aviso tipo="cuidado">
+
+- Usar **380 V** en un aparato monofásico (o 220 V en uno trifásico).
+- Olvidarse del **√3** en trifásica: la corriente te da 1,7 veces más grande.
+- Olvidarse del **cos φ** en motores: la corriente te da más chica de lo que es.
+- Multiplicar por el cos φ en vez de dividir.
+
+</Aviso>
+
+<SimuladorCorriente />
+
+<PracticaTema tipo="corriente" />

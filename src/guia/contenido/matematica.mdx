@@ -1,0 +1,71 @@
+import { Aviso, Formula } from '@/components/guia/Aviso'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+
+No hace falta saber mucha matemática para ser electricista, pero sí manejar **cuatro herramientas** con soltura: cambiar de unidades, despejar una fórmula, sacar porcentajes y usar un par de raíces que aparecen siempre.
+
+## Prefijos y unidades
+
+Las magnitudes eléctricas usan prefijos para no escribir muchos ceros:
+
+| Prefijo | Símbolo | Vale        | Ejemplo                        |
+| ------- | ------- | ----------- | ------------------------------ |
+| mega    | M       | 1 000 000   | 0,5 MΩ = 500 000 Ω (aislación) |
+| kilo    | k       | 1000        | 2,2 kW = 2200 W                |
+| —       | —       | 1           | 1 A, 1 V, 1 Ω                  |
+| mili    | m       | 1/1000      | 30 mA = 0,03 A (diferencial)   |
+| micro   | µ       | 1/1 000 000 | 1 µA = 0,000 001 A             |
+
+<Aviso tipo="atajo">
+
+- Para pasar de **kilo a la unidad**, multiplicá por 1000 (corré la coma 3 lugares a la derecha).
+- Para pasar de **mili a la unidad**, dividí por 1000 (corré la coma 3 lugares a la izquierda).
+
+</Aviso>
+
+<Aviso tipo="cuidado">
+  No confundas **kW** (potencia) con **kWh** (energía), ni **m** (mili) con **M** (mega): la
+  diferencia es de mil millones de veces.
+</Aviso>
+
+## Despejar una fórmula
+
+Todas las fórmulas que vas a usar son productos y cocientes. La regla es una sola: **lo que multiplica de un lado pasa dividiendo al otro, y lo que divide pasa multiplicando**.
+
+<Formula leyenda="Ejemplo: de la potencia a la corriente">P = U · I → I = P / U</Formula>
+
+**Ejemplo:** un horno de 2200 W en 220 V → I = 2200 / 220 = **10 A**.
+
+Con la ley de Ohm pasa lo mismo: `U = I · R`, entonces `I = U / R` y `R = U / I`.
+
+## Porcentajes
+
+<Formula>X % de A = A · X / 100</Formula>
+
+- 3 % de 220 V = 220 · 3 / 100 = **6,6 V** (caída de tensión máxima).
+- Si a 21 A le restás el 20 % (agrupamiento), te queda el 80 %: 21 · 0,8 = **16,8 A**.
+
+<Aviso tipo="atajo">
+  "Restar el 20 %" es lo mismo que "multiplicar por 0,8"; "restar el 30 %" es multiplicar por 0,7.
+</Aviso>
+
+## Potencias y raíces que aparecen siempre
+
+| Número | Vale   | Dónde aparece                                                |
+| ------ | ------ | ------------------------------------------------------------ |
+| √2     | ≈ 1,41 | Pasar del valor eficaz al máximo: 220 · 1,41 ≈ 311 V         |
+| √3     | ≈ 1,73 | Trifásica: 220 · 1,73 ≈ 380 V, y en I = P / (√3 · U · cos φ) |
+| I²     | I · I  | Efecto Joule: el calor crece con el cuadrado de la corriente |
+
+## Áreas, para la superficie de la vivienda
+
+El grado de electrificación sale de los **m²**. Rectángulo: largo · ancho. Una habitación de 3,5 m × 4 m tiene **14 m²**. Para formas en L, se divide en rectángulos y se suman.
+
+## Practicá las cuentas
+
+Cuentas sueltas como las que aparecen en los cálculos, cada una con su atajo para hacerla de cabeza. También están en el modo práctica, como **Cuentas rápidas**.
+
+<PracticaTema tipo="cuentas" />
+
+## Preguntas
+
+<PracticaTema tipo="conceptos" tema="matematica" />

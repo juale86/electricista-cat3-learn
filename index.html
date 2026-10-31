@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Electricista Cat. III</title>
+    <script>
+      // Aplica el tema guardado (src/store/tema.ts) antes de pintar, para que no destelle.
+      try {
+        const tema = JSON.parse(localStorage.getItem('electricista-tema') ?? '{}').state?.tema
+        const oscuro = tema ? tema === 'oscuro' : matchMedia('(prefers-color-scheme: dark)').matches
+        document.documentElement.classList.toggle('dark', oscuro)
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

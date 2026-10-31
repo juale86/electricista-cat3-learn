@@ -1,0 +1,82 @@
+import { Ref } from '@/components/Cita'
+import { Aviso, Formula } from '@/components/guia/Aviso'
+import { SimuladorCaida } from '@/components/guia/Simuladores'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+import { TablaCaida } from '@/components/guia/Tablas'
+
+Todo cable tiene resistencia, así que parte de la tensión "se pierde" en el camino. Si la caída es grande, las lámparas iluminan menos, los motores arrancan mal y el cable se calienta de más. Por eso, además de la corriente admisible, **la sección tiene que verificar la caída de tensión**.
+
+## Límites
+
+La caída se mide **desde los bornes de salida del tablero principal hasta la boca más lejana**.
+
+| Circuito                                  | Caída máxima                        |
+| ----------------------------------------- | ----------------------------------- |
+| Terminales (iluminación y tomacorrientes) | **3 %**                             |
+| Que alimentan solo motores                | 5 % en régimen, 15 % en el arranque |
+| Seccionales                               | 1 % recomendado                     |
+
+Fuente: <Ref aea="770.15.6" />. En 220 V, el 3 % son **6,6 V**.
+
+<Aviso tipo="nota" titulo="Diferencia con el manual del curso">
+  El manual habla de 3 % para iluminación y 5 % para "fuerza motriz". La AEA 770 de 2017 aclara que
+  el **3 % vale también para los tomacorrientes**.
+</Aviso>
+
+## Método por tabla
+
+<Formula leyenda="c en V/(A·km) · I en A · L en km" aea="Tabla 770.15.IV">
+  ΔU = c · I · L
+</Formula>
+
+- **L** es la **distancia** del tablero a la boca, en kilómetros (25 m = 0,025 km). No es el largo total de cable: la constante **c ya incluye la ida y la vuelta**.
+- **c** sale de la tabla, según la sección:
+
+<TablaCaida />
+
+Después se pasa a porcentaje:
+
+<Formula>ΔU% = ΔU / 220 · 100</Formula>
+
+**Ejemplo:** TUG de 2,5 mm², 10 A, a 25 m del tablero.
+
+- ΔU = 15 · 10 · 0,025 = **3,75 V**
+- ΔU% = 3,75 / 220 · 100 = **1,7 %** → verifica (es menor que 3 %).
+
+## ¿Hasta qué distancia llega un cable?
+
+Despejando la fórmula sale el **largo máximo** para una sección y una corriente:
+
+<Formula leyenda="6,6 V = 3 % de 220 V">L máx = 6,6 / (c · I)</Formula>
+
+**Ejemplo:** 2,5 mm² con 16 A → L máx = 6,6 / (15 · 16) = 0,0275 km = **27,5 m**. Más lejos que eso, hay que subir a 4 mm².
+
+<Aviso tipo="atajo">
+  Con 2,5 mm² (c = 15), **cada 10 A en 10 m son 1,5 V ≈ 0,7 %**. A partir de ahí escalá: el doble de
+  corriente o el doble de distancia da el doble de caída.
+</Aviso>
+
+## Fórmula completa
+
+Cuando hay datos de resistencia (R) y reactancia (X) del cable, la <Ref aea="770.15.6" /> usa:
+
+<Formula leyenda="k = 2 en monofásico, √3 en trifásico · R y X en Ω/km">
+  ΔU = k · I · L · (R · cos φ + X · sen φ)
+</Formula>
+
+Si no se conoce el cos φ, se toma 0,85 (sen φ = 0,53). En el arranque de motores, cos φ = 0,30.
+
+## Errores típicos
+
+<Aviso tipo="cuidado">
+
+- Dejar la distancia en metros (el resultado sale 1000 veces más grande).
+- Duplicar la distancia "por la ida y la vuelta": la c ya lo tiene en cuenta.
+- Calcular el porcentaje sobre 380 V en un circuito monofásico.
+- Confundir volts con porcentaje.
+
+</Aviso>
+
+<SimuladorCaida />
+
+<PracticaTema tipo="caida" />

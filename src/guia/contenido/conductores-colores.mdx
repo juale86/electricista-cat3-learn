@@ -1,0 +1,74 @@
+import { Ref } from '@/components/Cita'
+import { Aviso } from '@/components/guia/Aviso'
+import { ColoresConductores } from '@/components/guia/Instalacion'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+
+El cable es lo primero que mira un inspector: si el tipo, la sección o el color están mal, la instalación no se aprueba aunque todo funcione.
+
+## Qué cables se pueden usar
+
+| Cable                            | Cómo es                                   | Dónde va                                                                 |
+| -------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------ |
+| **IRAM NM 247-3** (o IRAM 62267) | Unipolar, sin envoltura, aislación de PVC | **Solo dentro de caños** (embutidos o a la vista) o de cablecanales      |
+| **IRAM 2178-1** (o IRAM 62266)   | Con envoltura (tipo «subterráneo»)        | En caño o cablecanal, **directamente enterrado** o en conducto enterrado |
+
+Fuente: <Ref aea="770.10.2" />. El IRAM 62267 y el IRAM 62266 son las versiones **LS0H**: no largan humo tóxico ni halógenos si se queman.
+
+<Aviso tipo="cuidado">
+  El unipolar NM 247-3 **no se puede enterrar ni dejar a la vista** sin caño o cablecanal. Para
+  llevar la línea por el patio hace falta un cable con envoltura (IRAM 2178-1).
+</Aviso>
+
+Otras reglas de las canalizaciones:
+
+- **Directamente enterrado:** a **0,70 m** o más de profundidad, con cinta «PELIGRO ELÉCTRICO» a 0,20 m de la superficie y protección mecánica (ladrillos o losetas) <Ref aea="770.10.4.2.1" />.
+- **Caño metálico:** no se puede pasar **un solo** unipolar por dentro <Ref aea="770.10.3.8.4" />. El caño metálico tampoco reemplaza al conductor de protección.
+- **Un solo cable por borne,** salvo que el borne esté hecho para más <Ref aea="770.16.4" />.
+
+## Secciones mínimas
+
+| Uso                                      | Sección mínima (mm²) |
+| ---------------------------------------- | -------------------- |
+| Línea principal                          | 4                    |
+| Circuito seccional                       | 2,5                  |
+| Iluminación de uso general (IUG)         | 1,5                  |
+| IUG que también alimenta tomas           | 2,5                  |
+| Tomas de uso general (TUG)               | 2,5                  |
+| Tomas de uso especial (TUE)              | 2,5                  |
+| Alimentación y retornos de llaves de luz | 1                    |
+| Conductor de protección (PE)             | 2,5                  |
+
+Fuente: <Ref aea="Tabla 770.11.I" />.
+
+<Aviso tipo="nota">
+  Algunos apuntes basados en la AEA 771 (2006) piden **1,5 mm²** para los retornos de las llaves. La
+  770 de 2017 baja ese mínimo a 1 mm². En la práctica muchos instaladores siguen usando 1,5 mm².
+</Aviso>
+
+Las secciones mínimas son un piso: después hay que verificar la corriente y la caída de tensión (ver **Sección y protección** y **Caída de tensión** en el bloque Cálculos).
+
+## Código de colores
+
+<ColoresConductores />
+
+Las reglas que más se preguntan <Ref aea="770.10.3.8.5" />:
+
+1. **Verde-amarillo es solo para el PE.** No se puede usar para ninguna otra cosa, ni tampoco verde solo o amarillo solo.
+2. **Celeste es solo para el neutro.**
+3. **En monofásico** la fase puede ser marrón, negra o roja. Si el circuito sale de una instalación trifásica, la fase va del color de la fase de la que sale.
+4. **Retornos de llaves:** no pueden ser de los colores de fase, neutro ni PE (ni verde o amarillo solos).
+
+En Córdoba la carpeta modelo del ERSeP usa **blanco** para los retornos <Ref carpeta="sección 05" />. Si no hay cable blanco, se admite un color de fase **marcado con anillos o cinta en los dos extremos**, pero nunca celeste, verde, amarillo ni verde-amarillo.
+
+<Aviso tipo="atajo">
+  Regla para acordarse: **lo que protege es verde-amarillo, lo que vuelve es celeste, lo que mata es
+  marrón, negro o rojo**. El neutro también puede dar patada si se corta; tratalo siempre como si
+  tuviera tensión.
+</Aviso>
+
+<Aviso tipo="cuidado">
+  Los tomas **«biuso»** (aceptan fichas de patas redondas y planas) son **antirreglamentarios**
+  <Ref carpeta="sección 05" />. Se usan tomas IRAM 2071 de patas planas con tierra.
+</Aviso>
+
+<PracticaTema tipo="conceptos" tema="conductores-colores" />

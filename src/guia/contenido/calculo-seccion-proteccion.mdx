@@ -1,0 +1,84 @@
+import { Ref } from '@/components/Cita'
+import { Aviso, Formula } from '@/components/guia/Aviso'
+import { SimuladorSeccion } from '@/components/guia/Simuladores'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+import { TablaAgrupamiento, TablaCircuitos, TablaIz } from '@/components/guia/Tablas'
+
+El termomagnético (PIA) **protege al cable**, no al aparato. Por eso la sección del conductor y el calibre de la protección se eligen juntos, con una sola regla.
+
+## Las tres corrientes
+
+- **Ib (corriente de proyecto):** la que va a circular normalmente por el circuito. Sale del cálculo de potencia o de la DPMS.
+- **In (corriente nominal del PIA):** el calibre del termomagnético (10 A, 16 A, 20 A…).
+- **Iz (corriente admisible del cable):** la máxima que el cable soporta en forma permanente sin recalentarse. Sale de la tabla de la norma.
+
+<Formula aea="770.15.2.1">Ib ≤ In ≤ Iz</Formula>
+
+- **Ib ≤ In:** el PIA no tiene que saltar con el consumo normal.
+- **In ≤ Iz:** el PIA tiene que cortar antes de que el cable se recaliente.
+
+## Corriente admisible (Iz)
+
+La tabla vale para cables **IRAM NM 247-3** (unipolares de PVC) dentro de caños, con **40 °C** de temperatura ambiente. En un circuito **monofásico** hay 2 conductores cargados (fase y neutro); el PE no cuenta.
+
+<TablaIz />
+
+Si en el **mismo caño** van varios circuitos, los cables se calientan entre sí y la Iz baja:
+
+<TablaAgrupamiento />
+
+## Topes de cada tipo de circuito
+
+Aunque el cable aguante más, cada tipo de circuito tiene un **calibre máximo** y una **sección mínima**:
+
+<TablaCircuitos />
+
+<Aviso tipo="norma">
+  En monofásico, el PIA tiene que ser **bipolar** (corta fase y neutro). Están prohibidos los
+  unipolares y los "1P+N" (<Ref aea="770.16.5.1" />
+  ). Además, solo se admiten interruptores según **IEC 60898** (<Ref aea="770.16.5.2" />
+  ), y su poder de corte tiene que ser mayor que la corriente de cortocircuito del lugar (
+  <Ref aea="770.15.2.2.2" />
+  ): en la <Ref carpeta /> se usan 3 kA en los circuitos y 6 kA en la cabecera.
+</Aviso>
+
+## Paso a paso
+
+1. Calculá **Ib**.
+2. Arrancá por la **sección mínima** del tipo de circuito.
+3. Buscá su **Iz** en la tabla y multiplicala por el **factor de agrupamiento**.
+4. Buscá un calibre comercial de PIA que cumpla **Ib ≤ In ≤ Iz** y que no supere el tope del circuito.
+5. Si no hay ninguno, subí a la sección siguiente y repetí.
+
+**Ejemplo:** circuito TUG con Ib = 12 A, comparte el caño con otro circuito.
+
+- Sección mínima de un TUG: 2,5 mm².
+- Iz = 21 A × 0,8 = 16,8 A.
+- PIA que cumpla 12 ≤ In ≤ 16,8 → **16 A**, que además no supera el tope de 20 A del TUG.
+- Resultado: **2,5 mm² con PIA de 16 A**. Si el caño fuera solo para ese circuito, podría ser de 20 A.
+
+<Aviso tipo="atajo">
+  Memorizá la Iz sin agrupar: **1,5 → 15 A · 2,5 → 21 A · 4 → 28 A · 6 → 36 A**. Con 2 circuitos en
+  el caño, restá el 20 %; con 3, el 30 %.
+</Aviso>
+
+<Aviso tipo="nota" titulo="Diferencia con el manual del curso">
+  La tabla del manual (<Ref manual="4.4, Tabla 45" />) da 18 A para 2,5 mm²: es el valor con **3
+  conductores cargados** (trifásico). Para un circuito monofásico la <Ref aea="Tabla 770.12.I" /> da
+  21 A.
+</Aviso>
+
+## Errores típicos
+
+<Aviso tipo="cuidado">
+
+- Elegir el PIA por el aparato y no por el cable.
+- Poner un PIA más grande que la Iz "para que no salte".
+- Olvidarse del factor de agrupamiento cuando van varios circuitos en el mismo caño.
+- Poner un PIA unipolar en un circuito monofásico.
+
+</Aviso>
+
+<SimuladorSeccion />
+
+<PracticaTema tipo="seccion" />

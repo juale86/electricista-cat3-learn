@@ -1,0 +1,64 @@
+import { Aviso, Formula } from '@/components/guia/Aviso'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+import { SimuladorOhm, SimuladorSerieParalelo } from '@/components/guia/SimuladoresFundamentos'
+
+Tres magnitudes explican casi todo lo que pasa en una instalación. Una comparación útil es la de un caño de agua: la **tensión** es la presión, la **corriente** es el caudal y la **resistencia** es lo angosto del caño.
+
+## Las tres magnitudes
+
+| Magnitud    | Símbolo | Unidad     | Qué es                                                              |
+| ----------- | ------- | ---------- | ------------------------------------------------------------------- |
+| Tensión     | U (o V) | volt (V)   | La "presión" que empuja a los electrones. Se mide entre dos puntos. |
+| Corriente   | I       | ampere (A) | La cantidad de electricidad que circula por segundo.                |
+| Resistencia | R       | ohm (Ω)    | La oposición que presenta un material al paso de la corriente.      |
+
+## Conductores y aislantes
+
+- **Conductores:** dejan pasar la corriente con facilidad. Cobre, aluminio, acero.
+- **Aislantes:** casi no la dejan pasar. PVC, goma, porcelana, vidrio.
+
+Un cable es un conductor (cobre) cubierto por un aislante (PVC). La resistencia de un cable depende del material, del largo y de la sección:
+
+<Formula leyenda="ρ del cobre ≈ 0,0175 Ω·mm²/m (Manual Cat. III, 2.6) · L en m · S en mm²">
+  R = ρ · L / S
+</Formula>
+
+Más largo → más resistencia. Más grueso → menos resistencia. Por eso en tramos largos hay que subir la sección.
+
+## Ley de Ohm
+
+<Formula>U = I · R</Formula>
+
+Despejando: **I = U / R** y **R = U / I**.
+
+<Aviso tipo="atajo">
+  **Triángulo de Ohm:** U arriba, I y R abajo. Tapá con el dedo lo que buscás y queda la cuenta: si
+  tapás I queda U / R; si tapás U queda I · R.
+</Aviso>
+
+**Ejemplo:** una resistencia de calefactor de 22 Ω en 220 V → I = 220 / 22 = **10 A**.
+
+<SimuladorOhm />
+
+## Serie y paralelo
+
+|                         | Serie                                       | Paralelo                                             |
+| ----------------------- | ------------------------------------------- | ---------------------------------------------------- |
+| Conexión                | Uno a continuación del otro, un solo camino | Todos entre los mismos dos puntos                    |
+| Corriente               | **La misma** en todos                       | Se reparte                                           |
+| Tensión                 | Se reparte                                  | **La misma** en todos                                |
+| Resistencia equivalente | Req = R1 + R2 + … (mayor que la más grande) | Req = (R1 · R2) / (R1 + R2) (menor que la más chica) |
+| Si se corta uno         | Se apagan todos                             | Los demás siguen funcionando                         |
+
+En las viviendas **todo se conecta en paralelo**: así cada artefacto recibe 220 V y funciona aunque otro esté apagado.
+
+<Aviso tipo="nota" titulo="Trabajo práctico del curso (unidad 2)">
+  Dos lámparas iguales en **serie** a 220 V iluminan mucho menos: cada una recibe 110 V. En
+  **paralelo** cada una recibe 220 V y da toda su luz. Probalo en el simulador.
+</Aviso>
+
+<SimuladorSerieParalelo />
+
+<PracticaTema tipo="ohm" />
+
+<PracticaTema tipo="conceptos" tema="electricidad-basica" />

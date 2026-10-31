@@ -1,0 +1,97 @@
+import { Ref } from '@/components/Cita'
+import { Aviso, Formula } from '@/components/guia/Aviso'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+
+En una vivienda hay dos protecciones que hacen trabajos distintos y **no se reemplazan entre sí**:
+
+|             | Termomagnético (PIA)         | Diferencial (ID)                                                  |
+| ----------- | ---------------------------- | ----------------------------------------------------------------- |
+| Qué protege | **El cable**                 | **Las personas**                                                  |
+| Contra qué  | Sobrecargas y cortocircuitos | Corrientes de fuga a tierra (alguien tocando, una masa con falla) |
+| Qué mide    | Cuánta corriente pasa        | La diferencia entre la corriente que va y la que vuelve           |
+| Norma       | IEC 60898-1                  | IEC 61008 (solo diferencial) o IEC 61009 (con termomagnética)     |
+
+## Termomagnético (PIA)
+
+Tiene dos disparadores:
+
+- **Térmico** (una lámina bimetálica): actúa ante **sobrecargas**, cuando pasa un poco más de corriente de la que el cable aguanta. Tarda más cuanto menor es el exceso.
+- **Magnético** (una bobina): actúa al instante ante un **cortocircuito**, cuando la corriente sube muchas veces por encima del calibre.
+
+### Lo que exige la norma
+
+- **Solo interruptores IEC 60898-1** para proteger circuitos <Ref aea="770.16.5.2" />.
+- **En monofásico, siempre bipolar:** corta fase y neutro a la vez. Están **prohibidos** los unipolares, los «1P+N» y los de neutro pasante <Ref aea="770.16.5.1" />.
+- El calibre se elige con la regla de la sobrecarga:
+
+<Formula aea="770.15.2.1">Ib ≤ In ≤ Iz</Formula>
+
+- **Poder de corte:** el número en el rectángulo del frente (por ejemplo `3000`) es la corriente de cortocircuito que puede cortar sin romperse. Tiene que ser **mayor o igual** que la corriente de cortocircuito posible en ese punto <Ref aea="770.15.2.2.2" />. La carpeta del ERSeP usa **3 kA** en los circuitos y **6 kA** en el TPA <Ref carpeta />.
+
+### Curvas
+
+La letra delante del calibre indica cuánto pico de corriente aguanta antes de que salte el magnético:
+
+| Curva | Salta con        | Uso típico                                           |
+| ----- | ---------------- | ---------------------------------------------------- |
+| **B** | 3 a 5 veces In   | Iluminación, cables largos                           |
+| **C** | 5 a 10 veces In  | Tomas y uso general                                  |
+| **D** | 10 a 20 veces In | Motores y transformadores con mucho pico de arranque |
+
+Valores de la IEC 60898-1 (no están en la AEA 770). La carpeta del ERSeP usa **B10 para iluminación** y **C10 para tomas** <Ref carpeta />.
+
+<Aviso tipo="cuidado">
+  El PIA **no protege a un motor** contra sobrecarga: hace falta un guardamotor o un relé térmico
+  <Ref aea="770.13.3" />.
+</Aviso>
+
+## Diferencial (ID)
+
+Compara la corriente que entra por la fase con la que vuelve por el neutro. Si falta algo, esa corriente se está yendo a tierra (por una persona o por una masa con falla) y el diferencial corta.
+
+- **Todos los circuitos terminales** llevan diferencial de **30 mA o menos, no retardado** <Ref aea="770.14.2.3" />.
+- En las viviendas (esquema **TT**) es la **única protección aceptada** contra contactos indirectos por corte automático. **No vale usar el PIA para eso** <Ref aea="770.14.3.2" />.
+- Con diferenciales de **hasta 300 mA** y una puesta a tierra de **40 Ω o menos**, el circuito se considera protegido contra contactos indirectos, porque una masa con falla no pasa de 24 V: 40 Ω × 0,3 A = 12 V <Ref aea="770.14.3.2" />. Ver **Puesta a tierra**.
+- Entre tableros se admite uno de **hasta 300 mA**, preferentemente **selectivo** (marcado «S»), para que salte primero el de 30 mA que está más cerca de la falla.
+
+<Aviso tipo="cuidado">
+  El diferencial **no protege contra sobrecargas ni cortocircuitos** y aguanta poca corriente de
+  cortocircuito. Siempre tiene que haber un termomagnético que lo proteja, aguas arriba o en los
+  circuitos de abajo en el mismo tablero <Ref aea="770.15.2.2.5" />.
+</Aviso>
+
+### Qué calibre de diferencial
+
+La corriente nominal del diferencial tiene que cumplir una de estas dos condiciones <Ref aea="770.15.2.2.5" />:
+
+- ser **igual o mayor que la del termomagnético** que tiene aguas arriba, o
+- ser **igual o mayor que la suma** de los PIA que tiene abajo.
+
+Ejemplo de la carpeta del ERSeP: un termomagnético de 32 A en el TPA, entonces un diferencial de **2 × 40 A**.
+
+### Cómo se prueba
+
+- **Botón de test:** se aprieta y tiene que saltar. Los fabricantes recomiendan probarlo **una vez por mes**.
+- **Con instrumento:** se inyecta la corriente de disparo entre la fase y el borne de tierra de cada toma, y se mide el tiempo de actuación. Es parte de la verificación antes de certificar.
+
+<Aviso tipo="nota">
+  El tipo más común es el **AC** (detecta fugas de alterna). Para lavarropas, aires inverter y
+  equipos electrónicos suele recomendarse el **tipo A**, que también detecta fugas de continua
+  pulsante.
+</Aviso>
+
+## DPS (protector de sobretensiones)
+
+Protege los aparatos de los picos de tensión por rayos o maniobras en la red. Cuándo es obligatorio <Ref aea="Tabla 770.15.III" />:
+
+- **Siempre**, si el edificio tiene pararrayos.
+- Si la red de baja tensión que llega es **aérea** (aunque sea en parte) y la zona tiene **más de 25 días de tormenta por año**.
+- Con red totalmente subterránea, no es obligatorio.
+
+La protección contra sobretensiones **permanentes** (por ejemplo, cuando se corta el neutro de la red) queda a criterio del proyectista, aunque la norma la recomienda <Ref aea="770.15.5" />.
+
+## ¿Y los fusibles?
+
+En la 770 los circuitos se protegen **solo con interruptores automáticos**. Los fusibles quedan para la protección de la distribuidora en la acometida o como protección de respaldo de un diferencial.
+
+<PracticaTema tipo="conceptos" tema="protecciones" />

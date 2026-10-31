@@ -1,0 +1,52 @@
+import { Ref } from '@/components/Cita'
+import { Aviso } from '@/components/guia/Aviso'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+
+Medir es la forma de **comprobar** que una instalación está bien. Para el certificado de instalación apta del ERSeP hay que hacer y registrar varias mediciones.
+
+## Multímetro (tester)
+
+| Función         | Cómo se conecta                       | Cuidado                                                 |
+| --------------- | ------------------------------------- | ------------------------------------------------------- |
+| **Voltímetro**  | En **paralelo**, entre los dos puntos | Elegir CA (V~) y un rango mayor que la tensión esperada |
+| **Amperímetro** | En **serie**, abriendo el circuito    | Si lo conectás en paralelo hacés un cortocircuito       |
+| **Óhmetro**     | Entre los extremos del elemento       | **Siempre sin tensión**                                 |
+| **Continuidad** | Entre los extremos del cable          | Sin tensión; sirve para identificar cables              |
+
+## Pinza amperométrica
+
+Mide la corriente **sin abrir el circuito**: se abraza el cable con la pinza.
+
+<Aviso tipo="cuidado">
+  Hay que abrazar **un solo conductor** (la fase o el neutro). Si abrazás la fase y el neutro
+  juntos, las corrientes se compensan y la pinza marca cero.
+</Aviso>
+
+## Megóhmetro: resistencia de aislación
+
+Verifica que la aislación de los cables no tenga fugas. Aplica una tensión alta (que el multímetro común no puede generar) y mide resistencias muy grandes, en MΩ.
+
+1. Instalación **sin tensión**, con los **artefactos desconectados** y los **interruptores cerrados**.
+2. Ensayo a **500 V CC** durante un minuto (instalaciones de hasta 500 V).
+3. Se mide entre fases, entre fases y neutro, entre fases y PE, y entre neutro y PE.
+4. Resultado mínimo: **0,5 MΩ**.
+
+Fuente: <Ref aea="Tabla 770.19.I" /> y <Ref aea="770.19.5.2" />. Si marca cerca de 0 Ω, hay un cable dañado o en contacto con tierra: hay que revisarlo antes de dar tensión.
+
+## Telurímetro: resistencia de puesta a tierra
+
+Mide la resistencia entre la jabalina y la tierra. Se usan **tres electrodos**: la jabalina a medir, un electrodo auxiliar de corriente y una sonda de tensión. La sonda se ubica al **62 %** de la distancia entre los otros dos, y se repite la lectura corriéndola 1 m hacia cada lado.
+
+<Aviso tipo="norma">
+  La resistencia de puesta a tierra tiene que ser de **40 Ω como máximo** (<Ref aea="770.3.2" />
+  ). El método de medición está en <Ref aea="770.19.5.3" />. Si da más, se agregan jabalinas o se
+  busca otra ubicación.
+</Aviso>
+
+## Otros instrumentos
+
+- **Detector de tensión:** para la tercera regla de oro (verificar ausencia de tensión). Hay que probarlo antes en un punto con tensión.
+- **Cofímetro:** mide el cos φ de una carga (trabajo práctico de la <Ref utn={9} />).
+- **Probador de diferencial:** inyecta una fuga controlada para comprobar que el diferencial dispara y en qué tiempo.
+
+<PracticaTema tipo="conceptos" tema="mediciones" />

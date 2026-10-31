@@ -1,0 +1,72 @@
+import { Ref } from '@/components/Cita'
+import { Aviso } from '@/components/guia/Aviso'
+import { RecorridoTablero } from '@/components/guia/Instalacion'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+
+El tablero es donde están todas las protecciones. En el examen se pregunta mucho **el orden** de los dispositivos y **dónde no se puede poner** un tablero.
+
+## Tipos de tablero
+
+| Tablero                     | Qué es                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------- |
+| **Caja del medidor**        | Recibe la línea de la distribuidora y contiene el medidor                             |
+| **TP** (principal)          | Recibe la línea principal, tiene el interruptor principal y de él salen los circuitos |
+| **TS** (seccional)          | Recibe un circuito seccional desde el TP y reparte sus propios circuitos              |
+| **TSG** (seccional general) | Recibe la **única** salida del TP y de él salen los demás circuitos                   |
+
+Fuente: <Ref aea="770.16.1" />.
+
+En Córdoba la carpeta del ERSeP usa dos nombres propios <Ref carpeta />:
+
+- **TPA** (tablero de protección de la acometida): está junto al medidor, en el pilar.
+- **TPU** (tablero principal del usuario): el que está dentro de la casa.
+
+## El orden, del medidor a los circuitos
+
+<RecorridoTablero />
+
+Lo que hay que entender, más que memorizar:
+
+1. **Primero se corta todo:** el interruptor de cabecera corta y protege toda la instalación. En la 770 es de **63 A como máximo**; si hace falta más, la instalación pasa a la AEA 771. **Todo interruptor de cabecera corta también el neutro** <Ref aea="770.16.5.3" />.
+2. **Después se protege a las personas:** el diferencial de 30 mA cubre a todos los circuitos que tiene abajo.
+3. **Al final se protege cada cable:** un PIA por circuito, del calibre que corresponde a su sección.
+
+En el ejemplo de la carpeta, el TPU **arranca directamente con el diferencial**, porque el termomagnético de 32 A del TPA ya protege la línea principal. Eso se admite cuando del tablero de arriba sale una sola línea <Ref aea="770.16.5.3" />.
+
+<Aviso tipo="nota">
+  También se puede poner **varios diferenciales** (cada uno con un grupo de circuitos) después del
+  interruptor principal, o **un diferencial por circuito** <Ref aea="770.16.5.4" />. Así, una falla
+  en un circuito no deja sin luz a toda la casa.
+</Aviso>
+
+<Aviso tipo="cuidado">
+  Un **tablero seccional** también lleva su dispositivo de cabecera, con aptitud de seccionamiento
+  (interruptor-seccionador, automático o diferencial), y **un PIA por cada circuito** que sale de él{' '}
+  <Ref aea="770.16.5.4" />.
+</Aviso>
+
+## Cómo tiene que ser el tablero
+
+- **Grado de protección IP41 o IP31D** como mínimo, sin partes con tensión al alcance aun con la puerta abierta. **IP54** si está a la intemperie.
+- **Gabinete de doble aislación** (clase II) para el TP.
+- **Reserva del 20 %** de espacio libre para agregar circuitos.
+- **Dispositivos en vertical, alimentados por arriba.** Si se alimentan por abajo, va un cartel que lo avise.
+- **Barra o bornera de tierra** identificada, con un borne para el PE de cada circuito.
+- **Símbolo de riesgo eléctrico** de 40 mm o más en el frente, y leyendas en castellano que se lean a 1 m.
+- **Plano del tablero** pegado dentro de la tapa <Ref carpeta />.
+
+Fuente: <Ref aea="770.16.4" />.
+
+## Dónde va y dónde no
+
+- Las palancas tienen que quedar **entre 0,40 m y 2 m** del piso.
+- El TP va **dentro de la propiedad**, a **2 m o menos** del medidor <Ref aea="770.16.3.1" />.
+- **Delante** del tablero hay que dejar **0,90 m** libres, con buena iluminación <Ref aea="770.16.2" />.
+- A **0,50 m** o más de cualquier boca o artefacto de **gas** <Ref aea="770.17" />.
+
+<Aviso tipo="cuidado">
+  **Prohibido** instalar el tablero **en el baño**, **dentro de muebles** (alacenas, placares),
+  **bajo mesadas** o en lugares de difícil acceso <Ref aea="770.16.2" />.
+</Aviso>
+
+<PracticaTema tipo="conceptos" tema="tablero" />

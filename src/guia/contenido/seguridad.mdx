@@ -1,0 +1,76 @@
+import { Ref } from '@/components/Cita'
+import { Aviso } from '@/components/guia/Aviso'
+import { PracticaTema } from '@/components/guia/PracticaTema'
+import { SimuladorCuerpo } from '@/components/guia/SimuladoresFundamentos'
+
+La razón de ser de la Ley 10281 es **cuidar la vida de las personas**. Antes de aprender a instalar, hay que entender qué le hace la electricidad al cuerpo y cómo trabajar sin riesgo.
+
+## Qué le pasa al cuerpo
+
+Una persona se **electriza** cuando la corriente pasa por su cuerpo: entra por un punto y sale por otro. Se habla de **electrocución** cuando la persona muere. Los efectos principales son:
+
+- **Tetanización:** los músculos se contraen sin control y no se puede soltar lo que se agarró.
+- **Asfixia:** la corriente afecta el centro nervioso de la respiración.
+- **Fibrilación ventricular:** el corazón se mueve en forma desordenada y deja de bombear sangre. Es la **principal causa de muerte** por choque eléctrico.
+- **Quemaduras:** en la piel y por dentro; las profundas pueden ser mortales.
+
+## Umbrales en corriente alterna
+
+| Umbral      | Valor              | Qué significa                                                          |
+| ----------- | ------------------ | ---------------------------------------------------------------------- |
+| Percepción  | 0,5 mA             | Se empieza a sentir                                                    |
+| No soltar   | 10 mA              | Por encima, no se puede soltar el objeto                               |
+| Fibrilación | Depende del tiempo | Con menos de 100 mA puede producirse si el contacto dura más de 500 ms |
+
+Fuente: <Ref manual="2.19" /> (basado en IEC 60479).
+
+## Qué hace más grave un accidente
+
+- **La intensidad** de la corriente y **el tiempo** que dura el contacto: son los dos factores más importantes.
+- **El recorrido:** si atraviesa el tórax o la cabeza, el daño es mayor.
+- **La resistencia del cuerpo:** baja mucho con la piel mojada. El manual toma **2500 Ω** entre mano y pie.
+- **El tipo de corriente:** a igual valor, la alterna de 50 Hz es más peligrosa que la continua.
+
+<Aviso tipo="norma">
+  Tensiones de seguridad aceptadas por la AEA: **24 V** en locales secos y **12 V** en locales
+  húmedos, mojados o donde el cuerpo puede estar sumergido (<Ref manual="2.19" />
+  ).
+</Aviso>
+
+<SimuladorCuerpo />
+
+## Contacto directo e indirecto
+
+|                 | Contacto directo                                                                           | Contacto indirecto                                                   |
+| --------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| Qué se toca     | Una **parte activa**: cable, borne, barra (incluido el neutro)                             | Una **masa** que quedó con tensión por una falla (carcasa, gabinete) |
+| Ejemplo         | Tocar un cable pelado                                                                      | Tocar el lavarropas con una falla de aislación                       |
+| Cómo se protege | Aislación, envolturas, distancia, y el diferencial de 30 mA como protección complementaria | **Puesta a tierra** de las masas **más el diferencial**              |
+
+<Aviso tipo="cuidado">
+  Que la masa esté puesta a tierra no alcanza por sí solo: hace falta el diferencial para cortar.
+  **No existe el riesgo cero.** Anular o puentear un diferencial va contra la reglamentación.
+</Aviso>
+
+## Las cinco reglas de oro
+
+Para trabajar **sin tensión**, siempre en este orden:
+
+1. **Corte efectivo** de todas las fuentes de tensión.
+2. **Bloqueo y traba** de los aparatos de corte, para que nadie los vuelva a conectar.
+3. **Verificar la ausencia de tensión** con un instrumento en buen estado.
+4. **Puesta a tierra y en cortocircuito** de todas las posibles fuentes de tensión.
+5. **Señalizar** la zona de trabajo.
+
+Fuente: <Ref utn={6} />.
+
+## Elementos de protección personal (EPP)
+
+- **Cabeza:** casco dieléctrico.
+- **Ojos y cara:** anteojos o protector facial (contra arcos eléctricos y partículas).
+- **Manos:** guantes dieléctricos para trabajos con tensión.
+- **Pies:** calzado de seguridad dieléctrico.
+- **Oídos y respiración:** protector auditivo con herramientas ruidosas; barbijo o máscara con polvo (por ejemplo, al canaletear).
+- **Herramientas** con mango aislado.
+
+<PracticaTema tipo="conceptos" tema="seguridad" />
