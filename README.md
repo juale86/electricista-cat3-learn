@@ -13,6 +13,7 @@ Es una web pensada para el celular: se estudia un tema en la guía y se practica
   - **Formato de respuesta:** cálculo mental (±5 %), con calculadora (±1 %) u opción múltiple.
   - **Ejercicios:** cuentas rápidas, ley de Ohm, energía, preguntas de teoría, corriente desde la potencia, sección y protección, caída de tensión, grado y DPMS, y división de circuitos y tablero. Se repasa más lo que más se erra y se evita repetir los últimos ejercicios.
 - **Armá el tablero:** se eligen y ordenan las protecciones del tablero principal de una vivienda y los colores de los cables, y se verifica contra la norma con cada error citado.
+- **Circuitos en el plano:** se ubican bocas de techo, llaves y tomas en la planta de una casa, con los símbolos del curso, y se verifican los puntos mínimos de cada ambiente. Próximamente: trazar los circuitos desde el tablero.
 - **Modo oscuro.**
 
 ## Cómo correrlo
@@ -39,7 +40,7 @@ Abrí la dirección que muestra la consola (por defecto http://localhost:5173). 
 
 ## Tecnologías
 
-React 19, TypeScript, Vite, Tailwind CSS 4, [shadcn/ui](https://ui.shadcn.com), Zustand (estado y guardado local), TanStack Router (rutas por archivos) y MDX (contenido de la guía). ESLint y Prettier para el código.
+React 19, TypeScript, Vite, Tailwind CSS 4, [shadcn/ui](https://ui.shadcn.com), [React Flow](https://reactflow.dev) (plano interactivo), Zustand (estado y guardado local), TanStack Router (rutas por archivos) y MDX (contenido de la guía). ESLint y Prettier para el código.
 
 ## Estructura
 

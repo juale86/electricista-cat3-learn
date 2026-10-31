@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ChevronRight, Dumbbell, GraduationCap, LayoutPanelTop, Zap } from 'lucide-react'
+import { ChevronRight, Dumbbell, GraduationCap, House, LayoutPanelTop, Zap } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
   component: Inicio,
@@ -25,6 +25,12 @@ const SECCIONES = [
     icono: LayoutPanelTop,
     titulo: 'Armá el tablero',
     descripcion: 'Elegí y ordená las protecciones de una vivienda y los colores de los cables.',
+  },
+  {
+    to: '/plano',
+    icono: House,
+    titulo: 'Circuitos en el plano',
+    descripcion: 'Ubicá bocas, llaves y tomas en la planta de una casa y verificá los mínimos.',
   },
 ] as const
 

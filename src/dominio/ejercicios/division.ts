@@ -23,9 +23,9 @@ import { aea, carpetaERSeP } from '../referencias'
 import type { Dato, Ejercicio, Respuesta } from './tipos'
 import { armarOpciones, elegir, elegirPonderado, entero, formatear, mezclar } from './util'
 
-type TipoAmbiente = 'estar' | 'dormitorio' | 'cocina' | 'bano' | 'lavadero' | 'galeria'
+export type TipoAmbiente = 'estar' | 'dormitorio' | 'cocina' | 'bano' | 'lavadero' | 'galeria'
 
-interface Ambiente {
+export interface Ambiente {
   tipo: TipoAmbiente
   nombre: string
   /** Superficie en m²; en la galería, el largo en m. */
@@ -131,7 +131,7 @@ function generarVivienda(): Vivienda {
 }
 
 /** Puntos mínimos de la Tabla 770.7.III para un ambiente. */
-function puntosMinimos(ambiente: Ambiente, grado: GradoElectrificacion) {
+export function puntosMinimos(ambiente: Ambiente, grado: GradoElectrificacion) {
   const { tipo, medida } = ambiente
   switch (tipo) {
     case 'estar':
