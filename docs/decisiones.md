@@ -46,6 +46,17 @@
 - **Progreso:** se guarda en el navegador. Hay **varias partidas** (por ejemplo "repaso examen" y "práctica libre"), y se puede empezar de cero.
 - **Armá el tablero** (`/tablero`): primera versión hecha. Se arma el tablero principal de una vivienda generada al azar (la misma de los ejercicios de división): se agregan cabecera, diferencial y PIA al riel, se ordenan arrastrando (dnd-kit, funciona con el dedo) y se elige polos, calibre, curva, sensibilidad y circuito de cada uno; después, los colores de fase, neutro, PE y retorno. La verificación (`src/dominio/tablero.ts`, sin React) devuelve errores y avisos con su cita: orden, bipolar, Ib ≤ In ≤ Iz (cabecera contra la línea principal y PIA contra la sección), tope por tipo de circuito, 30 mA, diferencial protegido contra sobrecarga, un PIA por circuito y colores.
   - Pendiente: guardar resultados en la partida, casos con TPA (tablero que arranca con el diferencial), varios diferenciales por grupo de circuitos, DPS y tableros seccionales.
+- **Circuitos en el plano en planta** (modo nuevo, diseñado, sin empezar). Idea tomada de un plano del material del curso: vivienda con sala, patio, cocina, baño y dormitorio; circuito de iluminación en línea punteada roja (llaves → bocas de techo), circuito de tomas en línea llena azul, y C1/C2 saliendo del tablero.
+  - **Qué hace el usuario: ubicar y conectar.** El plano viene con paredes, puertas y ambientes. El usuario pone bocas de techo, llaves y tomas en cada ambiente y después traza cada circuito desde el tablero.
+  - **Qué se corrige:** puntos mínimos por ambiente (Tabla 770.7.III, la misma lógica de los ejercicios de división), máximo 15 bocas por circuito, luz y tomas en circuitos separados, cada boca de luz comandada por una llave del mismo ambiente, tomas en las paredes y luces en el techo, y que todos los circuitos salgan del tablero.
+  - **Planos:** dibujados por nosotros en SVG (algunas plantas típicas). Más adelante, un **generador** para practicar algo específico (por ejemplo, solo cocinas o solo pasillos con combinación).
+  - **Símbolos:** los del plano del curso son la referencia argentina: boca de techo (círculo con cruz), llave (círculo chico junto a la puerta), tomacorriente (símbolo con dos rayitas sobre la pared) y tablero (rectángulo con una X). Se redibujan como SVG propios. La imagen del curso no se sube al repo.
+  - **Tecnología:** React Flow encaja acá: cada elemento es un nodo con su borne, los circuitos son conexiones y el plano va de fondo. Es la misma base que después usa el simulador (accionar la llave y ver si la lámpara prende).
+  - **Etapas propuestas:**
+    1. Símbolos SVG propios, una planta dibujada y ubicar elementos con corrección de puntos mínimos.
+    2. Trazar los circuitos y corregirlos; los circuitos trazados pasan a «Armá el tablero».
+    3. Simulador sobre el mismo plano (llaves, lámparas, combinación).
+    4. Generador de plantas para práctica dirigida.
 - **Después:** obra completa, inspector y lectura de planos.
 - **Simulación de estados:** llaves encendidas o apagadas, lámpara que prende solo si la instalación está bien, borne sin conectar. Es un modelo propio de bornes y conexiones (TS + Zustand + SVG); no viene en ninguna librería.
   - **Propuesta (sugerida por Gemini):** Falstad para simular, React Flow para símbolos y nodos conectables, y `strokeDasharray` para mostrar la corriente alterna en el SVG. Evaluación:
