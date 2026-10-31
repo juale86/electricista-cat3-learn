@@ -46,7 +46,7 @@
 - **Progreso:** se guarda en el navegador. Hay **varias partidas** (por ejemplo "repaso examen" y "práctica libre"), y se puede empezar de cero.
 - **Armá el tablero** (`/tablero`): primera versión hecha. Se arma el tablero principal de una vivienda generada al azar (la misma de los ejercicios de división): se agregan cabecera, diferencial y PIA al riel, se ordenan arrastrando (dnd-kit, funciona con el dedo) y se elige polos, calibre, curva, sensibilidad y circuito de cada uno; después, los colores de fase, neutro, PE y retorno. La verificación (`src/dominio/tablero.ts`, sin React) devuelve errores y avisos con su cita: orden, bipolar, Ib ≤ In ≤ Iz (cabecera contra la línea principal y PIA contra la sección), tope por tipo de circuito, 30 mA, diferencial protegido contra sobrecarga, un PIA por circuito y colores.
   - Pendiente: guardar resultados en la partida, casos con TPA (tablero que arranca con el diferencial), varios diferenciales por grupo de circuitos, DPS y tableros seccionales.
-- **Circuitos en el plano en planta** (`/plano`, etapa 1 hecha). Idea tomada de un plano del material del curso: vivienda con sala, patio, cocina, baño y dormitorio; circuito de iluminación en línea punteada roja (llaves → bocas de techo), circuito de tomas en línea llena azul, y C1/C2 saliendo del tablero.
+- **Circuitos en el plano en planta** (`/plano`, etapas 1 y 2 hechas). Idea tomada de un plano del material del curso: vivienda con sala, patio, cocina, baño y dormitorio; circuito de iluminación en línea punteada roja (llaves → bocas de techo), circuito de tomas en línea llena azul, y C1/C2 saliendo del tablero.
   - **Qué hace el usuario: ubicar y conectar.** El plano viene con paredes, puertas y ambientes. El usuario pone bocas de techo, llaves y tomas en cada ambiente y después traza cada circuito desde el tablero.
   - **Qué se corrige:** puntos mínimos por ambiente (Tabla 770.7.III, la misma lógica de los ejercicios de división), máximo 15 bocas por circuito, luz y tomas en circuitos separados, cada boca de luz comandada por una llave del mismo ambiente, tomas en las paredes y luces en el techo, y que todos los circuitos salgan del tablero.
   - **Planos:** dibujados por nosotros en SVG (algunas plantas típicas). Más adelante, un **generador** para practicar algo específico (por ejemplo, solo cocinas o solo pasillos con combinación).
@@ -59,6 +59,16 @@
        - Corrección (`verificarPlano`): bocas y tomas mínimos por ambiente (`puntosMinimos`, compartido con los ejercicios de división); error si un ambiente tiene luz sin llave; aviso si la llave queda a más de 1 m de la puerta o no comanda ninguna luz. Una llave a menos de 1 m de una puerta sirve también al ambiente de al lado (por ejemplo, la de la galería puesta adentro, junto a la entrada). Estas dos reglas de llaves son de buena práctica, no de la AEA, y se muestran sin cita.
        - No se corrige todavía: tomas en las zonas del baño (AEA 701, sin relevar), altura de montaje ni el reparto de tomas en distintas paredes.
     2. Trazar los circuitos y corregirlos; los circuitos trazados pasan a «Armá el tablero».
+       - **Hecho.** Se crean circuitos IUG o TUG (C1, C2…) y se trazan tocando el tablero y después cada boca; cada toque une con la anterior y para cortar se toca un lugar vacío. Los tramos son aristas rectas de React Flow entre los centros de los símbolos (bornes invisibles), con el estilo del plano del curso: IUG en rojo punteado y TUG en azul lleno, y el nombre del circuito en el tramo que sale del tablero. Una luz se une a su llave con un tramo (el retorno).
+       - Corrección (`src/dominio/circuitosPlano.ts`), sumada a la de la etapa 1:
+         - cada circuito sale del tablero y no tiene tramos cortados (770.6.5);
+         - cada boca está en un solo circuito y ninguna queda sin conectar;
+         - en un TUG solo van tomas (770.6.6). Un IUG con tomas es válido («IUG con tomacorrientes derivados»), así que es un aviso que explica que pasa a contar 2200 VA (Tabla 770.8.I);
+         - máximo 15 bocas por circuito (Tabla 770.6.I); las llaves no cuentan como bocas (770.6.6, nota 1);
+         - circuitos mínimos del grado (Tabla 770.7.I, con los mismos `MINIMOS` de los ejercicios de división);
+         - cada luz unida a una llave y cada llave unida a una luz; aviso si la llave prende la luz de otro ambiente que no es el de al lado de su puerta (buena práctica, sin cita).
+       - Con el plano sin errores aparece «Armá el tablero de esta casa»: arma el caso con `armarCaso` (la misma cuenta de DPMS que los casos al azar) y abre `/tablero`.
+       - No se modela todavía: cajas de paso o derivación (los tramos van de boca a boca), cantidad de cables por caño, ni la llave de combinación.
     3. Simulador sobre el mismo plano (llaves, lámparas, combinación).
     4. Generador de plantas para práctica dirigida.
 - **Después:** obra completa, inspector y lectura de planos.

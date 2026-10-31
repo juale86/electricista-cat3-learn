@@ -249,6 +249,19 @@ function distanciaAPuerta(p: Punto, puerta: Puerta) {
   return distancia(p, proyectar(p, { a: { x: puerta.x, y: puerta.y }, b: fin, angulo: 0 }))
 }
 
+/**
+ * Ambientes que puede comandar una llave: el suyo y, si está junto a una puerta, también el de
+ * al lado (por ejemplo, la llave de la galería puesta adentro, al lado de la puerta de entrada).
+ */
+export function ambientesDeLlave(plano: Plano, llave: Elemento): Set<string> {
+  const ambientes = new Set([llave.ambiente])
+  for (const puerta of plano.puertas) {
+    if (distanciaAPuerta(llave, puerta) <= LLAVE_A_MANO)
+      for (const id of ambientesDePuerta(plano, puerta)) ambientes.add(id)
+  }
+  return ambientes
+}
+
 export interface HallazgoPlano {
   nivel: 'error' | 'aviso'
   texto: string
@@ -271,17 +284,7 @@ export function verificarPlano(plano: Plano, elementos: Elemento[]): HallazgoPla
   const fuenteMinimos = aea('Tabla 770.7.III')
   const llaves = elementos.filter((e) => e.clase === 'llave')
 
-  // Una llave sirve al ambiente donde está y, si está junto a una puerta, también al de al lado
-  // (por ejemplo, la llave de la galería puesta adentro, al lado de la puerta de entrada).
-  const sirveA = new Map<string, Set<string>>()
-  for (const llave of llaves) {
-    const ambientes = new Set([llave.ambiente])
-    for (const puerta of plano.puertas) {
-      if (distanciaAPuerta(llave, puerta) <= LLAVE_A_MANO)
-        for (const id of ambientesDePuerta(plano, puerta)) ambientes.add(id)
-    }
-    sirveA.set(llave.id, ambientes)
-  }
+  const sirveA = new Map(llaves.map((l) => [l.id, ambientesDeLlave(plano, l)]))
 
   for (const a of plano.ambientes) {
     const propios = elementos.filter((e) => e.ambiente === a.id)

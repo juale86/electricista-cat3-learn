@@ -24,6 +24,8 @@ interface EstadoTablero {
   /** `null` mientras no se verificó o después de cambiar algo */
   hallazgos: Hallazgo[] | null
   nuevoCaso: () => void
+  /** Arranca con un caso dado, por ejemplo el de los circuitos trazados en el plano */
+  cargarCaso: (caso: Caso) => void
   agregar: (clase: ClaseDispositivo) => void
   quitar: (id: string) => void
   actualizar: (id: string, cambios: CambiosDispositivo) => void
@@ -40,6 +42,7 @@ export const useTablero = create<EstadoTablero>()(
       colores: {},
       hallazgos: null,
       nuevoCaso: () => set({ caso: generarCaso(), dispositivos: [], colores: {}, hallazgos: null }),
+      cargarCaso: (caso) => set({ caso, dispositivos: [], colores: {}, hallazgos: null }),
       agregar: (clase) =>
         set((s) => ({
           dispositivos: [...s.dispositivos, { id: crypto.randomUUID(), clase } as Dispositivo],

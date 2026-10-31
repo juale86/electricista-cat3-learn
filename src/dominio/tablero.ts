@@ -7,7 +7,9 @@ import {
   CALIBRES_PIA,
   CIRCUITOS,
   DPMS,
+  GRADOS,
   IZ_MONOFASICO,
+  SECCIONES,
   TENSION_MONOFASICA,
   type GradoElectrificacion,
   type TipoCircuito,
@@ -131,7 +133,20 @@ export function generarCaso(): Caso {
       ib: DPMS.tue / TENSION_MONOFASICA,
     })),
   ]
-  return { grado: p.v.grado, dpms: p.dpms, ib: p.ib, lineaSeccion: p.linea, circuitos }
+  return armarCaso(p.v.grado, circuitos)
+}
+
+/**
+ * Completa un caso a partir de sus circuitos: la DPMS es la suma de la de cada circuito
+ * (Tabla 770.8.I, que ya está en su Ib) por el coeficiente del grado (Tabla 770.8.II).
+ */
+export function armarCaso(grado: GradoElectrificacion, circuitos: CircuitoCaso[]): Caso {
+  const coeficiente = GRADOS.find((g) => g.id === grado)!.coeficiente
+  const dpms = circuitos.reduce((s, c) => s + c.ib * TENSION_MONOFASICA, 0) * coeficiente
+  const ib = dpms / TENSION_MONOFASICA
+  const cabecera = CALIBRES_PIA.find((c) => c >= ib)!
+  const lineaSeccion = SECCIONES.find((s) => s >= 4 && IZ_MONOFASICO[s] >= cabecera)!
+  return { grado, dpms, ib, lineaSeccion, circuitos }
 }
 
 /** Lo que le falta elegir a un dispositivo, o lista vacía si está completo. */

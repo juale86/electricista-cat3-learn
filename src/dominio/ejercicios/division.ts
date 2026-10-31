@@ -229,7 +229,7 @@ interface Division {
 }
 
 /** Circuitos mínimos de la Tabla 770.7.I, separados en IUG y TUG. */
-const MINIMOS: Record<GradoElectrificacion, { iug: number; tug: number; total: number }> = {
+export const MINIMOS: Record<GradoElectrificacion, { iug: number; tug: number; total: number }> = {
   minimo: { iug: 1, tug: 1, total: 2 },
   medio: { iug: 1, tug: 1, total: 3 },
   elevado: { iug: 2, tug: 2, total: 5 },

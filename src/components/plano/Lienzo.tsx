@@ -1,11 +1,14 @@
-// Plano interactivo con React Flow: la planta va de fondo como un nodo fijo y cada elemento
-// ubicado es un nodo. En la etapa de circuitos, los bornes de cada símbolo serán sus handles.
+// Plano interactivo con React Flow: la planta va de fondo como un nodo fijo, cada elemento
+// ubicado es un nodo y cada tramo de un circuito es una arista entre los centros de dos símbolos.
 
 import {
   Controls,
+  Handle,
+  Position,
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
+  type Edge,
   type Node,
   type NodeChange,
   type NodeProps,
@@ -13,6 +16,7 @@ import {
 import '@xyflow/react/dist/style.css'
 import { useMemo, type MouseEvent } from 'react'
 
+import { TABLERO, type CircuitoPlano, type Tramo } from '@/dominio/circuitosPlano'
 import type { Elemento, Plano } from '@/dominio/plano'
 import { cn } from '@/lib/utils'
 import { planoActual, usePlano } from '@/store/plano'
@@ -20,26 +24,42 @@ import { temaEfectivo, useTema } from '@/store/tema'
 
 import { MARGEN_PLANTA, Planta } from './Planta'
 import { IconoSimbolo } from './Simbolos'
-import { TAMANO_SIMBOLO, type ClaseSimbolo } from './tamanos'
+import { ESTILO_CIRCUITO, TAMANO_SIMBOLO, type ClaseSimbolo } from './tamanos'
 
 type NodoPlanta = Node<{ plano: Plano; marcados: Set<string> }, 'planta'>
-type NodoSimbolo = Node<{ clase: ClaseSimbolo; angulo: number; borrando: boolean }, 'simbolo'>
+type NodoSimbolo = Node<
+  { clase: ClaseSimbolo; angulo: number; borrando: boolean; inicio: boolean },
+  'simbolo'
+>
 
 function NodoDePlanta({ data }: NodeProps<NodoPlanta>) {
   return <Planta plano={data.plano} marcados={data.marcados} />
 }
 
+/** Los tramos van de centro a centro: un borne invisible en el medio del símbolo. */
+const BORNE =
+  'pointer-events-none !top-1/2 !left-1/2 !min-h-0 !min-w-0 !size-px !border-0 !opacity-0'
+
 function NodoDeSimbolo({ data }: NodeProps<NodoSimbolo>) {
   return (
-    <IconoSimbolo
-      clase={data.clase}
-      angulo={data.angulo}
+    <div
       className={cn(
-        'size-full',
-        data.clase === 'tablero' ? 'text-foreground' : 'text-primary',
-        data.borrando && 'hover:text-destructive cursor-pointer',
+        'size-full rounded-full',
+        data.inicio && 'bg-amber-400/25 ring-4 ring-amber-500',
       )}
-    />
+    >
+      <IconoSimbolo
+        clase={data.clase}
+        angulo={data.angulo}
+        className={cn(
+          'size-full',
+          data.clase === 'tablero' ? 'text-foreground' : 'text-primary',
+          data.borrando && 'hover:text-destructive cursor-pointer',
+        )}
+      />
+      <Handle type="source" position={Position.Top} isConnectable={false} className={BORNE} />
+      <Handle type="target" position={Position.Top} isConnectable={false} className={BORNE} />
+    </div>
   )
 }
 
@@ -48,38 +68,72 @@ const TIPOS_NODO = { planta: NodoDePlanta, simbolo: NodoDeSimbolo }
 /** Separación del centro del tablero a la pared: queda medio embutido. */
 const SEPARACION_TABLERO = 10
 
-function nodoTablero(plano: Plano): NodoSimbolo {
+function nodoTablero(plano: Plano, inicio: boolean): NodoSimbolo {
   const t = TAMANO_SIMBOLO.tablero
   return {
-    id: 'tablero',
+    id: TABLERO,
     type: 'simbolo',
     position: { x: plano.tablero.x, y: plano.tablero.y - SEPARACION_TABLERO },
-    data: { clase: 'tablero', angulo: 270, borrando: false },
+    data: { clase: 'tablero', angulo: 270, borrando: false, inicio },
     width: t,
     height: t,
     draggable: false,
   }
 }
 
-function nodoElemento(e: Elemento, borrando: boolean): NodoSimbolo {
+function nodoElemento(
+  e: Elemento,
+  moviendo: boolean,
+  borrando: boolean,
+  inicio: boolean,
+): NodoSimbolo {
   const t = TAMANO_SIMBOLO[e.clase]
   return {
     id: e.id,
     type: 'simbolo',
     position: { x: e.x, y: e.y },
-    data: { clase: e.clase, angulo: e.angulo, borrando },
+    data: { clase: e.clase, angulo: e.angulo, borrando, inicio },
     width: t,
     height: t,
-    draggable: !borrando,
+    draggable: moviendo,
+  }
+}
+
+function aristaTramo(
+  t: Tramo,
+  circuito: CircuitoPlano | undefined,
+  activo: boolean,
+  borrando: boolean,
+): Edge {
+  const desdeTablero = t.desde === TABLERO || t.hasta === TABLERO
+  return {
+    id: t.id,
+    source: t.desde,
+    target: t.hasta,
+    type: 'straight',
+    label: desdeTablero ? circuito?.nombre : undefined,
+    labelStyle: { fontSize: 20, fontWeight: 700 },
+    labelBgPadding: [6, 3],
+    style: {
+      ...(circuito ? ESTILO_CIRCUITO[circuito.tipo] : {}),
+      strokeWidth: activo ? 6 : 4,
+      opacity: activo ? 1 : 0.7,
+      cursor: borrando ? 'pointer' : undefined,
+    },
   }
 }
 
 function Lienzo() {
   const planoId = usePlano((s) => s.planoId)
   const elementos = usePlano((s) => s.elementos[s.planoId])
+  const circuitos = usePlano((s) => s.circuitos[s.planoId])
+  const tramos = usePlano((s) => s.tramos[s.planoId])
   const herramienta = usePlano((s) => s.herramienta)
+  const circuitoActivo = usePlano((s) => s.circuitoActivo)
+  const inicioTramo = usePlano((s) => s.inicioTramo)
   const hallazgos = usePlano((s) => s.hallazgos)
-  const { poner, arrastrar, soltar, quitar } = usePlano.getState()
+  const { poner, arrastrar, soltar, quitar, tocarNodo, cortarTrazo, quitarTramo } =
+    usePlano.getState()
   const tema = useTema((s) => s.tema)
   const { screenToFlowPosition } = useReactFlow()
 
@@ -94,6 +148,7 @@ function Lienzo() {
 
   const nodos = useMemo<Node[]>(() => {
     const borrando = herramienta === 'borrar'
+    const moviendo = herramienta === null
     const planta: NodoPlanta = {
       id: 'planta',
       type: 'planta',
@@ -104,17 +159,35 @@ function Lienzo() {
       selectable: false,
       zIndex: -1,
     }
-    return [planta, nodoTablero(plano), ...(elementos ?? []).map((e) => nodoElemento(e, borrando))]
-  }, [plano, marcados, elementos, herramienta])
+    return [
+      planta,
+      nodoTablero(plano, inicioTramo === TABLERO),
+      ...(elementos ?? []).map((e) => nodoElemento(e, moviendo, borrando, inicioTramo === e.id)),
+    ]
+  }, [plano, marcados, elementos, herramienta, inicioTramo])
+
+  const aristas = useMemo<Edge[]>(() => {
+    const porId = new Map((circuitos ?? []).map((c) => [c.id, c]))
+    const trazando = herramienta === 'trazar'
+    return (tramos ?? []).map((t) =>
+      aristaTramo(
+        t,
+        porId.get(t.circuito),
+        !trazando || t.circuito === circuitoActivo,
+        herramienta === 'borrar',
+      ),
+    )
+  }, [circuitos, tramos, herramienta, circuitoActivo])
 
   const alTocar = (evento: MouseEvent) => {
+    if (herramienta === 'trazar') return cortarTrazo()
     if (herramienta === null || herramienta === 'borrar') return
     poner(herramienta, screenToFlowPosition({ x: evento.clientX, y: evento.clientY }))
   }
 
   const alCambiar = (cambios: NodeChange[]) => {
     for (const c of cambios) {
-      if (c.type !== 'position' || c.id === 'planta' || c.id === 'tablero') continue
+      if (c.type !== 'position' || c.id === 'planta' || c.id === TABLERO) continue
       if (c.position) arrastrar(c.id, c.position)
       if (c.dragging === false) soltar(c.id)
     }
@@ -123,14 +196,17 @@ function Lienzo() {
   return (
     <ReactFlow
       nodes={nodos}
+      edges={aristas}
       nodeTypes={TIPOS_NODO}
       nodeOrigin={[0.5, 0.5]}
       onNodesChange={alCambiar}
       onPaneClick={alTocar}
       onNodeClick={(evento, nodo) => {
         if (nodo.id === 'planta') alTocar(evento)
-        else if (herramienta === 'borrar' && nodo.id !== 'tablero') quitar(nodo.id)
+        else if (herramienta === 'trazar') tocarNodo(nodo.id)
+        else if (herramienta === 'borrar' && nodo.id !== TABLERO) quitar(nodo.id)
       }}
+      onEdgeClick={(_, arista) => herramienta === 'borrar' && quitarTramo(arista.id)}
       elementsSelectable={false}
       nodesConnectable={false}
       fitView
