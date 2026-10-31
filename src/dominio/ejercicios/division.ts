@@ -23,7 +23,8 @@ import { aea, carpetaERSeP } from '../referencias'
 import type { Dato, Ejercicio, Respuesta } from './tipos'
 import { armarOpciones, elegir, elegirPonderado, entero, formatear, mezclar } from './util'
 
-export type TipoAmbiente = 'estar' | 'dormitorio' | 'cocina' | 'bano' | 'lavadero' | 'galeria'
+export type TipoAmbiente =
+  'estar' | 'dormitorio' | 'cocina' | 'bano' | 'lavadero' | 'galeria' | 'pasillo'
 
 export interface Ambiente {
   tipo: TipoAmbiente
@@ -158,6 +159,12 @@ export function puntosMinimos(ambiente: Ambiente, grado: GradoElectrificacion) {
         : { iug: 1, tug: 2, regla: '1 luz y 2 tomas' }
     case 'galeria':
       return { iug: Math.ceil(medida / 5), tug: 0, regla: '1 luz cada 5 m de largo' }
+    case 'pasillo':
+      return {
+        iug: Math.max(1, Math.ceil(medida / 5)),
+        tug: 0,
+        regla: '1 luz cada 5 m de largo (mín. 1)',
+      }
   }
 }
 

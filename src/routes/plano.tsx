@@ -7,6 +7,7 @@ import {
   LayoutPanelTop,
   Plus,
   Power,
+  Shuffle,
   Spline,
   Trash2,
   X,
@@ -21,10 +22,12 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { NOMBRE_TIPO_CIRCUITO, type TipoCircuitoPlano } from '@/dominio/circuitosPlano'
 import { formatear } from '@/dominio/ejercicios'
+import { MODOS_GENERADOR, type ModoGenerador } from '@/dominio/generadorPlanos'
 import { NOMBRE_GRADO } from '@/dominio/normativa'
 import { NOMBRE_ELEMENTO, superficies, type ClaseElemento } from '@/dominio/plano'
+import { PLANOS } from '@/dominio/planos'
 import { cn } from '@/lib/utils'
-import { planoActual, usePlano, type Herramienta } from '@/store/plano'
+import { usePlanoActual, usePlano, type Herramienta } from '@/store/plano'
 import { useTablero } from '@/store/tablero'
 
 export const Route = createFileRoute('/plano')({
@@ -228,9 +231,78 @@ function Circuitos() {
   )
 }
 
+const MODOS = Object.keys(MODOS_GENERADOR) as ModoGenerador[]
+
+/** Casa tipo o una generada; generar otra borra lo hecho en la generada anterior. */
+function ElegirCasa() {
+  const plano = usePlanoActual()
+  const generado = usePlano((s) => s.generado)
+  const conTrabajo = usePlano((s) =>
+    s.generado ? (s.elementos[s.generado.id]?.length ?? 0) > 0 : false,
+  )
+  const { elegirPlano, generar } = usePlano.getState()
+  return (
+    <section className="space-y-2">
+      <ToggleGroup
+        type="single"
+        variant="outline"
+        value={plano.id}
+        onValueChange={(v) => v && elegirPlano(v)}
+        className="grid w-full grid-cols-2"
+        spacing={1}
+      >
+        <ToggleGroupItem value={PLANOS[0].id} className={ITEM}>
+          {PLANOS[0].nombre}
+          <span className="text-muted-foreground">La del plano del curso</span>
+        </ToggleGroupItem>
+        <ToggleGroupItem value={generado?.id ?? 'ninguno'} disabled={!generado} className={ITEM}>
+          Casa generada
+          <span className="text-muted-foreground">
+            {generado ? generado.nombre : 'Generá una abajo'}
+          </span>
+        </ToggleGroupItem>
+      </ToggleGroup>
+      <div className="space-y-1">
+        <p className="text-sm font-medium">Generar una casa nueva</p>
+        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+          {MODOS.map((modo) => {
+            const boton = (
+              <Button
+                key={modo}
+                variant="secondary"
+                className="h-auto flex-col items-start gap-0 px-3 py-1.5 text-left whitespace-normal"
+                onClick={conTrabajo ? undefined : () => generar(modo)}
+              >
+                <span className="flex items-center gap-1.5 font-medium">
+                  <Shuffle className="size-3.5" /> {MODOS_GENERADOR[modo].nombre}
+                </span>
+                <span className="text-muted-foreground text-xs font-normal">
+                  {MODOS_GENERADOR[modo].detalle}
+                </span>
+              </Button>
+            )
+            return conTrabajo ? (
+              <Confirmar
+                key={modo}
+                titulo="¿Generar otra casa?"
+                descripcion="Se borra lo que hiciste en la casa generada actual. La casa tipo no se toca."
+                accion="Generar"
+                onConfirmar={() => generar(modo)}
+              >
+                {boton}
+              </Confirmar>
+            ) : (
+              boton
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function DatosPlano() {
-  const planoId = usePlano((s) => s.planoId)
-  const { cubierta, semicubierta, grado } = superficies(planoActual(planoId))
+  const { cubierta, semicubierta, grado } = superficies(usePlanoActual())
   return (
     <dl className="bg-card grid grid-cols-2 gap-x-4 gap-y-1 rounded-xl border p-4 text-sm">
       <dt className="text-muted-foreground">Superficie cubierta</dt>
@@ -244,6 +316,7 @@ function DatosPlano() {
 }
 
 function CircuitosEnElPlano() {
+  const plano = usePlanoActual()
   const vaciar = usePlano((s) => s.vaciar)
   const verificar = usePlano((s) => s.verificar)
   const hallazgos = usePlano((s) => s.hallazgos)
@@ -284,6 +357,7 @@ function CircuitosEnElPlano() {
         </Confirmar>
       </header>
 
+      <ElegirCasa />
       <DatosPlano />
 
       <section className="space-y-3">
@@ -305,7 +379,7 @@ function CircuitosEnElPlano() {
         <Herramientas />
         <Circuitos />
         <Ayuda />
-        <LienzoPlano className="aspect-square max-h-[75svh] w-full" />
+        <LienzoPlano key={plano.id} className="aspect-square max-h-[75svh] w-full" />
         {probando && <TableroDePrueba />}
       </section>
 

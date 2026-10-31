@@ -20,7 +20,7 @@ import { TABLERO, type CircuitoPlano, type Tramo } from '@/dominio/circuitosPlan
 import { esLlave, type Elemento, type Plano } from '@/dominio/plano'
 import { simularPlano } from '@/dominio/simulacionPlano'
 import { cn } from '@/lib/utils'
-import { planoActual, usePlano } from '@/store/plano'
+import { usePlanoActual, usePlano } from '@/store/plano'
 import { temaEfectivo, useTema } from '@/store/tema'
 
 import { MARGEN_PLANTA, Planta } from './Planta'
@@ -145,7 +145,6 @@ function aristaTramo(
 }
 
 function Lienzo() {
-  const planoId = usePlano((s) => s.planoId)
   const elementos = usePlano((s) => s.elementos[s.planoId])
   const circuitos = usePlano((s) => s.circuitos[s.planoId])
   const tramos = usePlano((s) => s.tramos[s.planoId])
@@ -159,7 +158,7 @@ function Lienzo() {
   const tema = useTema((s) => s.tema)
   const { screenToFlowPosition } = useReactFlow()
 
-  const plano = planoActual(planoId)
+  const plano = usePlanoActual()
   const marcados = useMemo(
     () =>
       new Set(

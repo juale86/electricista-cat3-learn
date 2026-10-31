@@ -96,14 +96,19 @@ const MARGEN_PARED = 12
 /** Una llave más lejos que esto de la puerta no queda a mano al entrar */
 const LLAVE_A_MANO = 100
 
+/** Largo en m, para galerías y pasillos */
+export const largo = (a: AmbientePlano) => Math.max(a.ancho, a.alto) / 100
+
 export function medidaAmbiente(a: AmbientePlano): number {
-  if (a.tipo === 'galeria') return Math.max(a.ancho, a.alto) / 100
+  if (a.tipo === 'galeria' || a.tipo === 'pasillo') return largo(a)
   return (a.ancho * a.alto) / 10_000
 }
 
 export function describirMedida(a: AmbientePlano): string {
   const m = (cm: number) => (cm / 100).toLocaleString('es-AR')
   if (a.tipo === 'galeria') return `${m(Math.max(a.ancho, a.alto))} m de largo`
+  if (a.tipo === 'pasillo')
+    return `${m(Math.max(a.ancho, a.alto))} m de largo · ${m(Math.min(a.ancho, a.alto))} m de ancho`
   return `${m(a.ancho)} × ${m(a.alto)} m · ${medidaAmbiente(a).toLocaleString('es-AR')} m²`
 }
 
@@ -342,6 +347,26 @@ export function verificarPlano(plano: Plano, elementos: Elemento[]): HallazgoPla
       hallazgos.push({
         nivel: 'aviso',
         texto: `${a.nombre}: hay una llave pero ninguna boca de luz para comandar.`,
+        ambiente: a.id,
+      })
+  }
+
+  // Pasillos interiores de más de 3 m: una llave de combinación en cada extremo
+  for (const a of plano.ambientes) {
+    if (a.tipo !== 'pasillo' || largo(a) <= 3) continue
+    const horizontal = a.ancho >= a.alto
+    const total = horizontal ? a.ancho : a.alto
+    const posicion = (p: Punto) => (horizontal ? p.x - a.x : p.y - a.y)
+    const combinaciones = elementos.filter(
+      (e) => e.clase === 'combinacion' && ambientesDeLlave(plano, e).has(a.id),
+    )
+    const enUnExtremo = combinaciones.some((c) => posicion(c) <= total / 3)
+    const enElOtro = combinaciones.some((c) => posicion(c) >= (2 * total) / 3)
+    if (!enUnExtremo || !enElOtro)
+      hallazgos.push({
+        nivel: 'error',
+        texto: `${a.nombre}: mide ${largo(a).toLocaleString('es-AR')} m, así que lleva una llave de combinación en cada extremo, para prender y apagar desde las dos puntas.`,
+        fuente: aea('770.7.2'),
         ambiente: a.id,
       })
   }

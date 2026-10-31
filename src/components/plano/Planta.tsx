@@ -135,6 +135,23 @@ export function Planta({ plano, marcados }: { plano: Plano; marcados: Set<string
 
       {plano.ambientes.map((a) => {
         const cx = a.x + a.ancho / 2
+        // Ambientes angostos (pasillos): una sola línea, corrida del centro para la boca
+        if (a.alto < 200)
+          return (
+            <text
+              key={a.id}
+              x={a.x + a.ancho * 0.3}
+              y={a.y + a.alto / 2 + 9}
+              textAnchor="middle"
+              fontSize={24}
+              className="fill-muted-foreground select-none"
+            >
+              <tspan fontWeight={600} className="fill-foreground/80">
+                {a.nombre}
+              </tspan>{' '}
+              · {describirMedida(a)}
+            </text>
+          )
         // Arriba: el centro queda libre para la boca de techo y abajo abren las puertas
         const cy = a.y + 60
         return (

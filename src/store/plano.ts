@@ -18,6 +18,7 @@ import {
   type Plano,
   type Punto,
 } from '@/dominio/plano'
+import { generarPlano, type ModoGenerador } from '@/dominio/generadorPlanos'
 import { PLANOS } from '@/dominio/planos'
 import type { Caso } from '@/dominio/tablero'
 
@@ -26,6 +27,10 @@ export type Herramienta = ClaseElemento | 'trazar' | 'probar' | 'borrar' | null
 /** Lo hecho en cada plano, por id de plano. Se guarda en el navegador para seguir otro día. */
 interface EstadoPlano {
   planoId: string
+  /** La última casa generada (se guarda junto con lo hecho en ella) */
+  generado: Plano | null
+  elegirPlano: (planoId: string) => void
+  generar: (modo: ModoGenerador) => void
   elementos: Record<string, Elemento[]>
   circuitos: Record<string, CircuitoPlano[]>
   tramos: Record<string, Tramo[]>
@@ -60,10 +65,20 @@ interface EstadoPlano {
   caso: () => Caso
 }
 
+/** Al cambiar de casa: herramientas y prueba como al entrar */
+const reinicio = {
+  herramienta: 'boca',
+  circuitoActivo: null,
+  inicioTramo: null,
+  hallazgos: null,
+  prueba: { diferencial: true, apagados: [], llaves: [] },
+} satisfies Partial<EstadoPlano>
+
 const alternar = (lista: string[], id: string) =>
   lista.includes(id) ? lista.filter((x) => x !== id) : [...lista, id]
 
-export function planoActual(planoId: string): Plano {
+export function planoActual(planoId: string, generado: Plano | null): Plano {
+  if (generado?.id === planoId) return generado
   return PLANOS.find((p) => p.id === planoId) ?? PLANOS[0]
 }
 
@@ -74,7 +89,7 @@ export const usePlano = create<EstadoPlano>()(
         const actual = () => {
           const s = get()
           return {
-            plano: planoActual(s.planoId),
+            plano: planoActual(s.planoId, s.generado),
             elementos: s.elementos[s.planoId] ?? [],
             circuitos: s.circuitos[s.planoId] ?? [],
             tramos: s.tramos[s.planoId] ?? [],
@@ -98,6 +113,23 @@ export const usePlano = create<EstadoPlano>()(
 
         return {
           planoId: PLANOS[0].id,
+          generado: null,
+          elegirPlano: (planoId) => set({ planoId, ...reinicio }),
+          generar: (modo) =>
+            set((s) => {
+              const plano = generarPlano(modo)
+              // Lo hecho en la casa generada anterior no se guarda
+              const sin = <T>(r: Record<string, T>) =>
+                Object.fromEntries(Object.entries(r).filter(([id]) => id !== s.generado?.id))
+              return {
+                generado: plano,
+                planoId: plano.id,
+                elementos: sin(s.elementos),
+                circuitos: sin(s.circuitos),
+                tramos: sin(s.tramos),
+                ...reinicio,
+              }
+            }),
           elementos: {},
           circuitos: {},
           tramos: {},
@@ -218,8 +250,9 @@ export const usePlano = create<EstadoPlano>()(
       {
         name: 'electricista-plano',
         version: 1,
-        partialize: ({ planoId, elementos, circuitos, tramos }) => ({
+        partialize: ({ planoId, generado, elementos, circuitos, tramos }) => ({
           planoId,
+          generado,
           elementos,
           circuitos,
           tramos,
@@ -229,3 +262,5 @@ export const usePlano = create<EstadoPlano>()(
     { name: 'Plano', enabled: import.meta.env.DEV },
   ),
 )
+
+export const usePlanoActual = () => usePlano((s) => planoActual(s.planoId, s.generado))
