@@ -11,7 +11,8 @@ Es una web pensada para el celular: se estudia un tema en la guía y se practica
   - **Modo práctica:** corrección al instante, con los pasos y un atajo de cálculo mental.
   - **Modo examen:** rondas de 10 ejercicios con tiempo y corrección al final.
   - **Formato de respuesta:** cálculo mental (±5 %), con calculadora (±1 %) u opción múltiple.
-  - **Ejercicios:** cuentas rápidas, ley de Ohm, energía, preguntas de teoría, corriente desde la potencia, sección y protección, caída de tensión, y grado y DPMS. Se repasa más lo que más se erra y se evita repetir los últimos ejercicios.
+  - **Ejercicios:** cuentas rápidas, ley de Ohm, energía, preguntas de teoría, corriente desde la potencia, sección y protección, caída de tensión, grado y DPMS, y división de circuitos y tablero. Se repasa más lo que más se erra y se evita repetir los últimos ejercicios.
+- **Armá el tablero:** se eligen y ordenan las protecciones del tablero principal de una vivienda y los colores de los cables, y se verifica contra la norma con cada error citado.
 - **Modo oscuro.**
 
 ## Cómo correrlo

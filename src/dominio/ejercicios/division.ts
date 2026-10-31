@@ -54,7 +54,7 @@ const ESPECIALES = [
 ] as const
 
 /** Corriente asignada de diferenciales habituales en el mercado (IEC 61008), en A. */
-const CALIBRES_DIFERENCIAL = [25, 40, 63] as const
+export const CALIBRES_DIFERENCIAL = [25, 40, 63] as const
 
 const FUENTES_BOCAS = [aea('Tabla 770.7.III')]
 const FUENTES_DIVISION = [aea('Tabla 770.7.I'), aea('Tabla 770.6.I')]
@@ -338,7 +338,8 @@ function circuitosDe(d: Division, bocasIUG: number): CircuitosVivienda {
   }
 }
 
-function proyectoTablero() {
+/** Vivienda con sus circuitos y el tablero principal que le corresponde. */
+export function proyectoTablero() {
   const v = generarVivienda()
   const bocas = totalBocas(v)
   const division = divisionMinima(bocas, v)

@@ -44,7 +44,9 @@
   - Práctica: sin reloj y con corrección al instante, citando la norma.
   - Examen: rondas de 10 ejercicios con tiempo y corrección al final.
 - **Progreso:** se guarda en el navegador. Hay **varias partidas** (por ejemplo "repaso examen" y "práctica libre"), y se puede empezar de cero.
-- **Después del MVP:** armado de tablero (orden de protecciones, colores), obra completa, inspector y lectura de planos.
+- **Armá el tablero** (`/tablero`): primera versión hecha. Se arma el tablero principal de una vivienda generada al azar (la misma de los ejercicios de división): se agregan cabecera, diferencial y PIA al riel, se ordenan arrastrando (dnd-kit, funciona con el dedo) y se elige polos, calibre, curva, sensibilidad y circuito de cada uno; después, los colores de fase, neutro, PE y retorno. La verificación (`src/dominio/tablero.ts`, sin React) devuelve errores y avisos con su cita: orden, bipolar, Ib ≤ In ≤ Iz (cabecera contra la línea principal y PIA contra la sección), tope por tipo de circuito, 30 mA, diferencial protegido contra sobrecarga, un PIA por circuito y colores.
+  - Pendiente: guardar resultados en la partida, casos con TPA (tablero que arranca con el diferencial), varios diferenciales por grupo de circuitos, DPS y tableros seccionales.
+- **Después:** obra completa, inspector y lectura de planos.
 - **Simulación de estados:** llaves encendidas o apagadas, lámpara que prende solo si la instalación está bien, borne sin conectar. Es un modelo propio de bornes y conexiones (TS + Zustand + SVG); no viene en ninguna librería.
   - **Propuesta (sugerida por Gemini):** Falstad para simular, React Flow para símbolos y nodos conectables, y `strokeDasharray` para mostrar la corriente alterna en el SVG. Evaluación:
     - **React Flow** ([`@xyflow/react`](https://reactflow.dev), MIT): **sí**. Da nodos propios (cada símbolo es un componente con sus bornes como _handles_), cables arrastrables, zoom y soporte táctil. Nos ahorra todo el manejo de arrastre y conexiones.

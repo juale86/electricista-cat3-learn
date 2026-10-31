@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PracticaRouteImport } from './routes/practica'
+import { Route as TableroRouteImport } from './routes/tablero'
 import { Route as GuiaIndexRouteImport } from './routes/guia/index'
 import { Route as GuiaTemaIdRouteImport } from './routes/guia/$temaId'
 import { Route as PartidasPartidaIdIndexRouteImport } from './routes/partidas/$partidaId/index'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const PracticaRoute = PracticaRouteImport.update({
   id: '/practica',
   path: '/practica',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TableroRoute = TableroRouteImport.update({
+  id: '/tablero',
+  path: '/tablero',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuiaIndexRoute = GuiaIndexRouteImport.update({
@@ -50,6 +56,7 @@ const PartidasPartidaIdJugarRoute = PartidasPartidaIdJugarRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/practica': typeof PracticaRoute
+  '/tablero': typeof TableroRoute
   '/guia/$temaId': typeof GuiaTemaIdRoute
   '/guia/': typeof GuiaIndexRoute
   '/partidas/$partidaId/jugar': typeof PartidasPartidaIdJugarRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/practica': typeof PracticaRoute
+  '/tablero': typeof TableroRoute
   '/guia/$temaId': typeof GuiaTemaIdRoute
   '/guia': typeof GuiaIndexRoute
   '/partidas/$partidaId/jugar': typeof PartidasPartidaIdJugarRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/practica': typeof PracticaRoute
+  '/tablero': typeof TableroRoute
   '/guia/$temaId': typeof GuiaTemaIdRoute
   '/guia/': typeof GuiaIndexRoute
   '/partidas/$partidaId/jugar': typeof PartidasPartidaIdJugarRoute
@@ -77,6 +86,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/practica'
+    | '/tablero'
     | '/guia/$temaId'
     | '/guia/'
     | '/partidas/$partidaId/jugar'
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/practica'
+    | '/tablero'
     | '/guia/$temaId'
     | '/guia'
     | '/partidas/$partidaId/jugar'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/practica'
+    | '/tablero'
     | '/guia/$temaId'
     | '/guia/'
     | '/partidas/$partidaId/jugar'
@@ -102,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PracticaRoute: typeof PracticaRoute
+  TableroRoute: typeof TableroRoute
   GuiaTemaIdRoute: typeof GuiaTemaIdRoute
   GuiaIndexRoute: typeof GuiaIndexRoute
   PartidasPartidaIdJugarRoute: typeof PartidasPartidaIdJugarRoute
@@ -122,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/practica'
       fullPath: '/practica'
       preLoaderRoute: typeof PracticaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tablero': {
+      id: '/tablero'
+      path: '/tablero'
+      fullPath: '/tablero'
+      preLoaderRoute: typeof TableroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guia/': {
@@ -158,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PracticaRoute: PracticaRoute,
+  TableroRoute: TableroRoute,
   GuiaTemaIdRoute: GuiaTemaIdRoute,
   GuiaIndexRoute: GuiaIndexRoute,
   PartidasPartidaIdJugarRoute: PartidasPartidaIdJugarRoute,
