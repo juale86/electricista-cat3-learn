@@ -77,6 +77,8 @@
 - **Tercer bloque, en curso:** Instalación domiciliaria. Escritos: conductores y colores, canalizaciones, circuitos, protecciones, tableros y puesta a tierra, cada uno con 6 a 8 preguntas de práctica. Faltan **conexionado** (depende de esquemas dibujados: conviene hacerlo con el simulador o con SVG propios) y **locales especiales** (las zonas del baño están en la AEA 90364-7-701, que no tenemos relevada).
 - **Modo oscuro:** botón sol/luna arriba a la derecha. Arranca según la preferencia del sistema y recuerda la elección (`src/store/tema.ts`).
 - **Tipos de ejercicio nuevos:** `ohm`, `energia` y `conceptos`.
+- **División de circuitos y tablero** (`division`): parte de una vivienda generada al azar (chica, mediana o grande, para que salgan los grados mínimo, medio y elevado). Pregunta las bocas mínimas de luz y de tomas (Tabla 770.7.III), qué división en circuitos cumple la norma (15 bocas por circuito, mínimos del grado, TUE para aires u horno), el calibre de la cabecera a partir de la DPMS y la composición del tablero principal (orden, 30 mA, diferencial ≥ cabecera, PIA bipolares). Está en el modo práctica y al final de Circuitos y de Tableros.
+  - Simplificaciones: los módulos de la cocina para artefactos fijos no se cuentan como bocas; los diferenciales se eligen entre 25, 40 y 63 A (habituales en el mercado, sin verificar en la norma); no hay viviendas de grado superior.
   - `conceptos` es un banco de preguntas de opción múltiple en `dominio/ejercicios/conceptos.ts`. Cada pregunta tiene su tema, explicación y fuente, y se filtra por tema en la guía.
   - Las partidas creadas antes de este cambio no los incluyen: hay que activarlos en la configuración de la partida.
 

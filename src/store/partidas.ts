@@ -110,14 +110,18 @@ export const usePartidas = create<EstadoPartidas>()(
       }),
       {
         name: 'electricista-partidas',
-        version: 2,
-        // v2 agrega el tipo «cuentas»: se activa en las partidas que ya existían.
+        version: 3,
+        // Los tipos nuevos se activan en las partidas que ya existían: v2 «cuentas», v3 «division».
         migrate: (guardado, version) => {
           const estado = guardado as Pick<EstadoPartidas, 'partidas'>
-          if (version < 2) {
+          const nuevos: [number, TipoEjercicio][] = [
+            [2, 'cuentas'],
+            [3, 'division'],
+          ]
+          for (const [desde, tipo] of nuevos) {
+            if (version >= desde) continue
             for (const p of estado.partidas) {
-              if (!p.config.tipos.includes('cuentas'))
-                p.config.tipos = ['cuentas', ...p.config.tipos]
+              if (!p.config.tipos.includes(tipo)) p.config.tipos = [...p.config.tipos, tipo]
             }
           }
           return estado as EstadoPartidas

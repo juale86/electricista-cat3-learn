@@ -2,6 +2,7 @@ import { generarCaida } from './caida'
 import { generarConceptos } from './conceptos'
 import { generarCorriente } from './corriente'
 import { generarCuentas } from './cuentas'
+import { generarDivision } from './division'
 import { generarEnergia } from './energia'
 import { generarGrado } from './grado'
 import { generarOhm } from './ohm'
@@ -37,6 +38,7 @@ const GENERADORES: Record<TipoEjercicio, (tema?: string) => Omit<Ejercicio, 'id'
   seccion: generarSeccion,
   caida: generarCaida,
   grado: generarGrado,
+  division: generarDivision,
 }
 
 export interface EstadisticaTipo {

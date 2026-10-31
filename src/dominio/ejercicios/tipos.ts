@@ -1,7 +1,15 @@
 import type { Referencia } from '../referencias'
 
 export type TipoEjercicio =
-  'cuentas' | 'ohm' | 'energia' | 'conceptos' | 'corriente' | 'seccion' | 'caida' | 'grado'
+  | 'cuentas'
+  | 'ohm'
+  | 'energia'
+  | 'conceptos'
+  | 'corriente'
+  | 'seccion'
+  | 'caida'
+  | 'grado'
+  | 'division'
 
 export const TIPOS_EJERCICIO: TipoEjercicio[] = [
   'cuentas',
@@ -12,6 +20,7 @@ export const TIPOS_EJERCICIO: TipoEjercicio[] = [
   'seccion',
   'caida',
   'grado',
+  'division',
 ]
 
 export const NOMBRE_TIPO: Record<TipoEjercicio, string> = {
@@ -23,6 +32,7 @@ export const NOMBRE_TIPO: Record<TipoEjercicio, string> = {
   seccion: 'Sección y protección',
   caida: 'Caída de tensión',
   grado: 'Grado y demanda (DPMS)',
+  division: 'División de circuitos y tablero',
 }
 
 export type Respuesta =

@@ -88,6 +88,7 @@ export const BLOQUES: Bloque[] = [
         titulo: 'Tipos de circuito y grado de electrificación',
         descripcion: 'IUG, TUG, TUE y específicos; grados y puntos mínimos por ambiente.',
         unidadesUTN: [5, 11],
+        ejercicio: 'division',
       },
       {
         id: 'conexionado',
