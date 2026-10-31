@@ -47,7 +47,7 @@ export interface Plano {
   tablero: { x: number; y: number; ambiente: string }
 }
 
-export type ClaseElemento = 'boca' | 'llave' | 'toma'
+export type ClaseElemento = 'boca' | 'llave' | 'combinacion' | 'toma'
 
 export interface Elemento {
   id: string
@@ -62,6 +62,7 @@ export interface Elemento {
 export const NOMBRE_ELEMENTO: Record<ClaseElemento, string> = {
   boca: 'Boca de techo',
   llave: 'Llave de un punto',
+  combinacion: 'Llave de combinación',
   toma: 'Tomacorriente',
 }
 
@@ -78,7 +79,16 @@ export interface Segmento {
 }
 
 /** Distancia del centro del símbolo a la pared, para que quede apoyado sobre ella */
-export const SEPARACION_PARED: Record<ClaseElemento, number> = { boca: 0, llave: 14, toma: 16 }
+export const SEPARACION_PARED: Record<ClaseElemento, number> = {
+  boca: 0,
+  llave: 14,
+  combinacion: 14,
+  toma: 16,
+}
+
+/** Llaves de un punto y de combinación */
+export const esLlave = (e: Elemento | undefined) =>
+  e?.clase === 'llave' || e?.clase === 'combinacion'
 /** Las bocas de techo quedan al menos a esta distancia de las paredes */
 const MARGEN_TECHO = 30
 /** Ni llaves ni tomas en las esquinas ni pegadas al marco de una puerta */
@@ -282,7 +292,7 @@ export function verificarPlano(plano: Plano, elementos: Elemento[]): HallazgoPla
 
   const { grado } = superficies(plano)
   const fuenteMinimos = aea('Tabla 770.7.III')
-  const llaves = elementos.filter((e) => e.clase === 'llave')
+  const llaves = elementos.filter(esLlave)
 
   const sirveA = new Map(llaves.map((l) => [l.id, ambientesDeLlave(plano, l)]))
 

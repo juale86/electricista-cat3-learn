@@ -5,6 +5,7 @@ import { MINIMOS } from './ejercicios/division'
 import { CIRCUITOS, DPMS, NOMBRE_GRADO, TENSION_MONOFASICA, type TipoCircuito } from './normativa'
 import {
   ambientesDeLlave,
+  esLlave,
   NOMBRE_ELEMENTO,
   superficies,
   type Elemento,
@@ -123,7 +124,7 @@ export function verificarCircuitos(
 
     const luces = miembros.filter((e) => e.clase === 'boca')
     const tomas = miembros.filter((e) => e.clase === 'toma')
-    const llaves = miembros.filter((e) => e.clase === 'llave')
+    const llaves = miembros.filter(esLlave)
 
     if (c.tipo === 'TUG' && luces.length + llaves.length > 0)
       error(
@@ -147,7 +148,19 @@ export function verificarCircuitos(
     // Cada luz tiene que tener su llave, y cada llave tiene que comandar una luz
     const unidos = (e: Elemento) => (vecinos.get(e.id) ?? []).map((id) => porId.get(id))
     for (const luz of luces) {
-      if (!unidos(luz).some((v) => v?.clase === 'llave'))
+      const suyas = unidos(luz).filter(esLlave)
+      const combinaciones = suyas.filter((v) => v!.clase === 'combinacion').length
+      if (combinaciones === 1 && suyas.length === 1)
+        aviso(
+          `${c.nombre}: la luz de ${nombreAmbiente(luz.ambiente)} tiene una sola llave de combinación. Las combinaciones van de a dos, una en cada lugar desde donde se quiere prender; sola funciona como una llave común.`,
+          { ambiente: luz.ambiente },
+        )
+      if (combinaciones > 2)
+        aviso(
+          `${c.nombre}: la luz de ${nombreAmbiente(luz.ambiente)} tiene ${combinaciones} combinaciones. Para comandar desde más de dos lugares hacen falta llaves de cruce entre las dos combinaciones, que acá no se simulan.`,
+          { ambiente: luz.ambiente },
+        )
+      if (suyas.length === 0)
         error(
           `${c.nombre}: la boca de luz de ${nombreAmbiente(luz.ambiente)} no está unida a ninguna llave. Trazá un tramo de la boca a su llave (el retorno).`,
           { ambiente: luz.ambiente },

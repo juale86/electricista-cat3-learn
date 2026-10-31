@@ -30,6 +30,16 @@ function Llave() {
   )
 }
 
+/** Llave de combinación: como la de un punto, con un trazo para cada lado. */
+function Combinacion() {
+  return (
+    <g {...trazo}>
+      <circle r={5} fill="currentColor" />
+      <path d="M 3.5 -3.5 L 11 -11 M -3.5 3.5 L -11 11" />
+    </g>
+  )
+}
+
 /** Tomacorriente: medio círculo apoyado en la pared con las dos patas. */
 function Toma() {
   return (
@@ -53,6 +63,7 @@ function Tablero() {
 const DIBUJO: Record<ClaseSimbolo, () => React.JSX.Element> = {
   boca: Boca,
   llave: Llave,
+  combinacion: Combinacion,
   toma: Toma,
   tablero: Tablero,
 }

@@ -17,7 +17,8 @@ import '@xyflow/react/dist/style.css'
 import { useMemo, type MouseEvent } from 'react'
 
 import { TABLERO, type CircuitoPlano, type Tramo } from '@/dominio/circuitosPlano'
-import type { Elemento, Plano } from '@/dominio/plano'
+import { esLlave, type Elemento, type Plano } from '@/dominio/plano'
+import { simularPlano } from '@/dominio/simulacionPlano'
 import { cn } from '@/lib/utils'
 import { planoActual, usePlano } from '@/store/plano'
 import { temaEfectivo, useTema } from '@/store/tema'
@@ -28,7 +29,15 @@ import { ESTILO_CIRCUITO, TAMANO_SIMBOLO, type ClaseSimbolo } from './tamanos'
 
 type NodoPlanta = Node<{ plano: Plano; marcados: Set<string> }, 'planta'>
 type NodoSimbolo = Node<
-  { clase: ClaseSimbolo; angulo: number; borrando: boolean; inicio: boolean },
+  {
+    clase: ClaseSimbolo
+    angulo: number
+    borrando: boolean
+    inicio: boolean
+    /** Al probar: luz prendida o llave cerrada */
+    encendido?: boolean
+    tocable?: boolean
+  },
   'simbolo'
 >
 
@@ -46,6 +55,8 @@ function NodoDeSimbolo({ data }: NodeProps<NodoSimbolo>) {
       className={cn(
         'size-full rounded-full',
         data.inicio && 'bg-amber-400/25 ring-4 ring-amber-500',
+        data.encendido && 'bg-yellow-300/70 shadow-[0_0_24px_8px] shadow-yellow-300/80',
+        data.tocable && 'cursor-pointer',
       )}
     >
       <IconoSimbolo
@@ -86,13 +97,21 @@ function nodoElemento(
   moviendo: boolean,
   borrando: boolean,
   inicio: boolean,
+  encendido?: boolean,
 ): NodoSimbolo {
   const t = TAMANO_SIMBOLO[e.clase]
   return {
     id: e.id,
     type: 'simbolo',
     position: { x: e.x, y: e.y },
-    data: { clase: e.clase, angulo: e.angulo, borrando, inicio },
+    data: {
+      clase: e.clase,
+      angulo: e.angulo,
+      borrando,
+      inicio,
+      encendido,
+      tocable: encendido !== undefined && esLlave(e),
+    },
     width: t,
     height: t,
     draggable: moviendo,
@@ -104,6 +123,7 @@ function aristaTramo(
   circuito: CircuitoPlano | undefined,
   activo: boolean,
   borrando: boolean,
+  conTension: boolean,
 ): Edge {
   const desdeTablero = t.desde === TABLERO || t.hasta === TABLERO
   return {
@@ -111,6 +131,7 @@ function aristaTramo(
     source: t.desde,
     target: t.hasta,
     type: 'straight',
+    className: conTension ? 'con-tension' : undefined,
     label: desdeTablero ? circuito?.nombre : undefined,
     labelStyle: { fontSize: 20, fontWeight: 700 },
     labelBgPadding: [6, 3],
@@ -132,7 +153,8 @@ function Lienzo() {
   const circuitoActivo = usePlano((s) => s.circuitoActivo)
   const inicioTramo = usePlano((s) => s.inicioTramo)
   const hallazgos = usePlano((s) => s.hallazgos)
-  const { poner, arrastrar, soltar, quitar, tocarNodo, cortarTrazo, quitarTramo } =
+  const prueba = usePlano((s) => s.prueba)
+  const { poner, arrastrar, soltar, quitar, tocarNodo, cortarTrazo, quitarTramo, alternarLlave } =
     usePlano.getState()
   const tema = useTema((s) => s.tema)
   const { screenToFlowPosition } = useReactFlow()
@@ -144,6 +166,19 @@ function Lienzo() {
         (hallazgos ?? []).filter((h) => h.nivel === 'error' && h.ambiente).map((h) => h.ambiente!),
       ),
     [hallazgos],
+  )
+
+  const probando = herramienta === 'probar'
+  const simulacion = useMemo(
+    () =>
+      probando
+        ? simularPlano(elementos ?? [], circuitos ?? [], tramos ?? [], {
+            diferencial: prueba.diferencial,
+            apagados: new Set(prueba.apagados),
+            llaves: new Set(prueba.llaves),
+          })
+        : null,
+    [probando, elementos, circuitos, tramos, prueba],
   )
 
   const nodos = useMemo<Node[]>(() => {
@@ -162,9 +197,21 @@ function Lienzo() {
     return [
       planta,
       nodoTablero(plano, inicioTramo === TABLERO),
-      ...(elementos ?? []).map((e) => nodoElemento(e, moviendo, borrando, inicioTramo === e.id)),
+      ...(elementos ?? []).map((e) =>
+        nodoElemento(
+          e,
+          moviendo,
+          borrando,
+          inicioTramo === e.id,
+          simulacion === null || e.clase === 'toma'
+            ? undefined
+            : e.clase === 'boca'
+              ? simulacion.bocasPrendidas.has(e.id)
+              : prueba.llaves.includes(e.id),
+        ),
+      ),
     ]
-  }, [plano, marcados, elementos, herramienta, inicioTramo])
+  }, [plano, marcados, elementos, herramienta, inicioTramo, simulacion, prueba])
 
   const aristas = useMemo<Edge[]>(() => {
     const porId = new Map((circuitos ?? []).map((c) => [c.id, c]))
@@ -175,13 +222,14 @@ function Lienzo() {
         porId.get(t.circuito),
         !trazando || t.circuito === circuitoActivo,
         herramienta === 'borrar',
+        simulacion?.tramosConTension.has(t.id) ?? false,
       ),
     )
-  }, [circuitos, tramos, herramienta, circuitoActivo])
+  }, [circuitos, tramos, herramienta, circuitoActivo, simulacion])
 
   const alTocar = (evento: MouseEvent) => {
     if (herramienta === 'trazar') return cortarTrazo()
-    if (herramienta === null || herramienta === 'borrar') return
+    if (herramienta === null || herramienta === 'borrar' || probando) return
     poner(herramienta, screenToFlowPosition({ x: evento.clientX, y: evento.clientY }))
   }
 
@@ -204,6 +252,8 @@ function Lienzo() {
       onNodeClick={(evento, nodo) => {
         if (nodo.id === 'planta') alTocar(evento)
         else if (herramienta === 'trazar') tocarNodo(nodo.id)
+        else if (probando && esLlave(elementos?.find((e) => e.id === nodo.id)))
+          alternarLlave(nodo.id)
         else if (herramienta === 'borrar' && nodo.id !== TABLERO) quitar(nodo.id)
       }}
       onEdgeClick={(_, arista) => herramienta === 'borrar' && quitarTramo(arista.id)}

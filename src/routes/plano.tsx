@@ -6,6 +6,7 @@ import {
   Hand,
   LayoutPanelTop,
   Plus,
+  Power,
   Spline,
   Trash2,
   X,
@@ -30,7 +31,7 @@ export const Route = createFileRoute('/plano')({
   component: CircuitosEnElPlano,
 })
 
-const ELEMENTOS: ClaseElemento[] = ['boca', 'llave', 'toma']
+const ELEMENTOS: ClaseElemento[] = ['boca', 'llave', 'combinacion', 'toma']
 
 const ITEM =
   'data-[state=on]:border-primary data-[state=on]:bg-primary/10 h-auto min-w-0 flex-1 flex-col gap-1 px-1 py-1.5 text-[11px] leading-tight whitespace-normal'
@@ -44,7 +45,7 @@ function Herramientas() {
       variant="outline"
       value={herramienta ?? 'mover'}
       onValueChange={(v) => v && elegir(v === 'mover' ? null : (v as Herramienta))}
-      className="flex w-full flex-wrap"
+      className="grid w-full grid-cols-4"
       spacing={1}
     >
       {ELEMENTOS.map((clase) => (
@@ -56,6 +57,10 @@ function Herramientas() {
       <ToggleGroupItem value="trazar" className={ITEM}>
         <Spline className="size-7 p-0.5 text-red-600" />
         Trazar
+      </ToggleGroupItem>
+      <ToggleGroupItem value="probar" className={ITEM}>
+        <Power className="size-7 p-0.5 text-amber-500" />
+        Probar
       </ToggleGroupItem>
       <ToggleGroupItem value="mover" className={ITEM}>
         <Hand className="size-7 p-0.5" />
@@ -74,20 +79,90 @@ function Ayuda() {
   const activo = usePlano((s) => s.circuitos[s.planoId]?.find((c) => c.id === s.circuitoActivo))
   const inicio = usePlano((s) => s.inicioTramo)
   const texto =
-    herramienta === 'trazar'
-      ? !activo
-        ? 'Creá un circuito (IUG o TUG) o elegí uno para trazarlo.'
-        : inicio === null
-          ? `Trazando ${activo.nombre}: tocá el tablero (o una boca del circuito) para empezar.`
-          : `Trazando ${activo.nombre}: tocá la boca siguiente. Para cortar el trazo, tocá un lugar vacío.`
-      : herramienta === null
-        ? 'Arrastrá un elemento para cambiarlo de lugar. Si lo soltás fuera de la casa, se borra.'
-        : herramienta === 'borrar'
-          ? 'Tocá un elemento o un tramo para borrarlo.'
-          : herramienta === 'boca'
-            ? 'Tocá el techo de un ambiente para poner una boca.'
-            : `Tocá cerca de una pared para poner ${herramienta === 'llave' ? 'una llave' : 'un toma'}: se apoya sola en la pared más cercana.`
+    herramienta === 'probar'
+      ? 'Tocá las llaves para prender y apagar las luces. Abajo están las protecciones del tablero.'
+      : herramienta === 'trazar'
+        ? !activo
+          ? 'Creá un circuito (IUG o TUG) o elegí uno para trazarlo.'
+          : inicio === null
+            ? `Trazando ${activo.nombre}: tocá el tablero (o una boca del circuito) para empezar.`
+            : `Trazando ${activo.nombre}: tocá la boca siguiente. Para cortar el trazo, tocá un lugar vacío.`
+        : herramienta === null
+          ? 'Arrastrá un elemento para cambiarlo de lugar. Si lo soltás fuera de la casa, se borra.'
+          : herramienta === 'borrar'
+            ? 'Tocá un elemento o un tramo para borrarlo.'
+            : herramienta === 'boca'
+              ? 'Tocá el techo de un ambiente para poner una boca.'
+              : `Tocá cerca de una pared para poner ${herramienta === 'toma' ? 'un toma' : 'una llave'}: se apoya sola en la pared más cercana.`
   return <p className="text-muted-foreground text-sm">{texto}</p>
+}
+
+/** Interruptor del tablero para probar: palanca arriba = cerrado. */
+function Palanca({
+  nombre,
+  detalle,
+  cerrado,
+  onAlternar,
+}: {
+  nombre: string
+  detalle: string
+  cerrado: boolean
+  onAlternar: () => void
+}) {
+  return (
+    <button
+      role="switch"
+      aria-checked={cerrado}
+      onClick={onAlternar}
+      className="bg-card hover:bg-muted flex w-20 flex-col items-center gap-1 rounded-lg border p-2 text-xs"
+    >
+      <span className="font-semibold">{nombre}</span>
+      <span
+        className={cn(
+          'flex h-10 w-6 flex-col rounded-md border-2 p-0.5',
+          cerrado ? 'justify-start border-emerald-600' : 'border-muted-foreground justify-end',
+        )}
+      >
+        <span
+          className={cn('h-4 rounded-sm', cerrado ? 'bg-emerald-600' : 'bg-muted-foreground')}
+        />
+      </span>
+      <span className="text-muted-foreground">{cerrado ? 'Cerrado' : 'Abierto'}</span>
+      <span className="text-muted-foreground leading-tight">{detalle}</span>
+    </button>
+  )
+}
+
+function TableroDePrueba() {
+  const circuitos = usePlano((s) => s.circuitos[s.planoId])
+  const prueba = usePlano((s) => s.prueba)
+  const { alternarDiferencial, alternarPia } = usePlano.getState()
+  return (
+    <section className="space-y-2">
+      <p className="text-sm font-medium">Tablero</p>
+      <div className="flex flex-wrap gap-2">
+        <Palanca
+          nombre="ID"
+          detalle="30 mA"
+          cerrado={prueba.diferencial}
+          onAlternar={alternarDiferencial}
+        />
+        {(circuitos ?? []).map((c) => (
+          <Palanca
+            key={c.id}
+            nombre={c.nombre}
+            detalle={`PIA ${c.tipo}`}
+            cerrado={!prueba.apagados.includes(c.id)}
+            onAlternar={() => alternarPia(c.id)}
+          />
+        ))}
+      </div>
+      <p className="text-muted-foreground text-xs">
+        Si abrís el diferencial se corta todo; si abrís un PIA, solo su circuito. Los tramos con
+        tensión se marcan en amarillo.
+      </p>
+    </section>
+  )
 }
 
 const TIPOS: TipoCircuitoPlano[] = ['IUG', 'TUG']
@@ -173,6 +248,7 @@ function CircuitosEnElPlano() {
   const verificar = usePlano((s) => s.verificar)
   const hallazgos = usePlano((s) => s.hallazgos)
   const empezado = usePlano((s) => (s.elementos[s.planoId]?.length ?? 0) > 0)
+  const probando = usePlano((s) => s.herramienta === 'probar')
   const sinErrores = hallazgos !== null && !hallazgos.some((h) => h.nivel === 'error')
   const navegar = useNavigate()
   const armarTablero = () => {
@@ -221,11 +297,16 @@ function CircuitosEnElPlano() {
             <strong className="text-foreground">2. Trazá los circuitos.</strong> Creá cada circuito
             y unilo desde el tablero, boca por boca. Cada luz va unida a su llave.
           </p>
+          <p>
+            <strong className="text-foreground">3. Probá.</strong> Prendé las llaves y jugá con las
+            protecciones del tablero para ver qué se apaga.
+          </p>
         </div>
         <Herramientas />
         <Circuitos />
         <Ayuda />
         <LienzoPlano className="aspect-square max-h-[75svh] w-full" />
+        {probando && <TableroDePrueba />}
       </section>
 
       <Button size="lg" onClick={verificar}>

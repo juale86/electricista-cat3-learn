@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConexionadoRouteImport } from './routes/conexionado'
 import { Route as PlanoRouteImport } from './routes/plano'
 import { Route as PracticaRouteImport } from './routes/practica'
 import { Route as TableroRouteImport } from './routes/tablero'
@@ -21,6 +22,11 @@ import { Route as PartidasPartidaIdJugarRouteImport } from './routes/partidas/$p
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConexionadoRoute = ConexionadoRouteImport.update({
+  id: '/conexionado',
+  path: '/conexionado',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlanoRoute = PlanoRouteImport.update({
@@ -61,6 +67,7 @@ const PartidasPartidaIdJugarRoute = PartidasPartidaIdJugarRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/conexionado': typeof ConexionadoRoute
   '/plano': typeof PlanoRoute
   '/practica': typeof PracticaRoute
   '/tablero': typeof TableroRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/conexionado': typeof ConexionadoRoute
   '/plano': typeof PlanoRoute
   '/practica': typeof PracticaRoute
   '/tablero': typeof TableroRoute
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/conexionado': typeof ConexionadoRoute
   '/plano': typeof PlanoRoute
   '/practica': typeof PracticaRoute
   '/tablero': typeof TableroRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/conexionado'
     | '/plano'
     | '/practica'
     | '/tablero'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/conexionado'
     | '/plano'
     | '/practica'
     | '/tablero'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/conexionado'
     | '/plano'
     | '/practica'
     | '/tablero'
@@ -125,6 +137,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ConexionadoRoute: typeof ConexionadoRoute
   PlanoRoute: typeof PlanoRoute
   PracticaRoute: typeof PracticaRoute
   TableroRoute: typeof TableroRoute
@@ -141,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conexionado': {
+      id: '/conexionado'
+      path: '/conexionado'
+      fullPath: '/conexionado'
+      preLoaderRoute: typeof ConexionadoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/plano': {
@@ -197,6 +217,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConexionadoRoute: ConexionadoRoute,
   PlanoRoute: PlanoRoute,
   PracticaRoute: PracticaRoute,
   TableroRoute: TableroRoute,

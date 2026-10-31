@@ -58,7 +58,7 @@ export function DatosCaso() {
   )
 }
 
-function Muestra({ color }: { color: ColorCable }) {
+export function Muestra({ color }: { color: ColorCable }) {
   const { muestra } = COLORES_CABLE[color]
   return (
     <span

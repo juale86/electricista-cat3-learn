@@ -21,7 +21,7 @@ import {
 import { PLANOS } from '@/dominio/planos'
 import type { Caso } from '@/dominio/tablero'
 
-export type Herramienta = ClaseElemento | 'trazar' | 'borrar' | null
+export type Herramienta = ClaseElemento | 'trazar' | 'probar' | 'borrar' | null
 
 /** Lo hecho en cada plano, por id de plano. Se guarda en el navegador para seguir otro día. */
 interface EstadoPlano {
@@ -46,6 +46,11 @@ interface EstadoPlano {
   agregarCircuito: (tipo: TipoCircuitoPlano) => void
   elegirCircuito: (id: string) => void
   quitarCircuito: (id: string) => void
+  /** Estado de las llaves y protecciones al probar. No se guarda: al recargar arranca todo apagado. */
+  prueba: { diferencial: boolean; apagados: string[]; llaves: string[] }
+  alternarLlave: (id: string) => void
+  alternarPia: (circuito: string) => void
+  alternarDiferencial: () => void
   /** Con la herramienta de trazar: une el extremo anterior con este y sigue desde acá */
   tocarNodo: (id: string) => void
   cortarTrazo: () => void
@@ -54,6 +59,9 @@ interface EstadoPlano {
   /** El caso para «Armá el tablero» con los circuitos trazados */
   caso: () => Caso
 }
+
+const alternar = (lista: string[], id: string) =>
+  lista.includes(id) ? lista.filter((x) => x !== id) : [...lista, id]
 
 export function planoActual(planoId: string): Plano {
   return PLANOS.find((p) => p.id === planoId) ?? PLANOS[0]
@@ -97,6 +105,15 @@ export const usePlano = create<EstadoPlano>()(
           circuitoActivo: null,
           inicioTramo: null,
           hallazgos: null,
+          prueba: { diferencial: true, apagados: [], llaves: [] },
+          alternarLlave: (id) =>
+            set(({ prueba }) => ({ prueba: { ...prueba, llaves: alternar(prueba.llaves, id) } })),
+          alternarPia: (circuito) =>
+            set(({ prueba }) => ({
+              prueba: { ...prueba, apagados: alternar(prueba.apagados, circuito) },
+            })),
+          alternarDiferencial: () =>
+            set(({ prueba }) => ({ prueba: { ...prueba, diferencial: !prueba.diferencial } })),
           elegirHerramienta: (herramienta) => set({ herramienta, inicioTramo: null }),
           poner: (clase, punto) => {
             const lugar = ubicar(actual().plano, clase, punto)
