@@ -5,26 +5,76 @@
 import { aea, type Referencia } from './referencias'
 import { COLORES_CABLE, type ColorCable } from './tablero'
 
-export type ClasePieza = 'tablero' | 'lampara' | 'llave' | 'combinacion' | 'toma'
+export type ClasePieza =
+  | 'tablero'
+  | 'lampara'
+  | 'ventilador'
+  | 'timbre'
+  | 'llave'
+  | 'combinacion'
+  | 'pulsador'
+  | 'fotocontrol'
+  | 'minutero'
+  | 'toma'
 
 export const BORNES: Record<ClasePieza, readonly string[]> = {
   /** Salida del PIA del circuito y la barra de tierra */
   tablero: ['L', 'N', 'PE'],
   /** Portalámparas en la boca de techo; el PE va a la masa del artefacto */
   lampara: ['L', 'N', 'PE'],
+  ventilador: ['L', 'N', 'PE'],
+  /** Timbre de doble aislación: sin PE */
+  timbre: ['L', 'N'],
   llave: ['1', '2'],
   /** Común y dos viajeros */
   combinacion: ['C', '1', '2'],
+  /** Contacto que cierra solo mientras se aprieta */
+  pulsador: ['1', '2'],
+  /** Alimentación (L y N) y salida a la carga (S), que se activa de noche */
+  fotocontrol: ['L', 'N', 'S'],
+  /** Automático de escalera: alimentación, entrada de los pulsadores (P) y salida (S) */
+  minutero: ['L', 'N', 'P', 'S'],
   toma: ['L', 'N', 'PE'],
 }
 
 export const NOMBRE_PIEZA: Record<ClasePieza, string> = {
   tablero: 'Tablero',
   lampara: 'Lámpara',
+  ventilador: 'Ventilador de techo',
+  timbre: 'Timbre',
   llave: 'Llave de un punto',
   combinacion: 'Llave de combinación',
+  pulsador: 'Pulsador',
+  fotocontrol: 'Fotocontrol',
+  minutero: 'Minutero',
   toma: 'Tomacorriente',
 }
+
+/** Piezas que consumen: prenden, andan o suenan si quedan entre fase y neutro */
+export const CARGAS: ClasePieza[] = ['lampara', 'ventilador', 'timbre']
+/** Piezas con estado que se acciona: llaves, pulsadores, día/noche y temporizador */
+export const MANIOBRAS: ClasePieza[] = [
+  'llave',
+  'combinacion',
+  'pulsador',
+  'fotocontrol',
+  'minutero',
+]
+/** Equipos que necesitan fase y neutro para conmutar su salida */
+const EQUIPOS: ClasePieza[] = ['fotocontrol', 'minutero']
+
+const ANDANDO: Record<string, [string, string]> = {
+  lampara: ['prendida', 'apagada'],
+  ventilador: ['andando', 'parado'],
+  timbre: ['sonando', 'callado'],
+}
+
+/**
+ * Cómo tiene que funcionar cada carga: seguir el estado de una pieza (prendida si la llave está
+ * cerrada, el pulsador apretado, es de noche o el minutero está temporizando), o cambiar de
+ * estado con cada maniobra de cualquiera de varias piezas (combinación).
+ */
+export type Regla = { tipo: 'sigue'; pieza: string } | { tipo: 'conmuta'; piezas: string[] }
 
 export interface Pieza {
   id: string
@@ -39,6 +89,10 @@ export interface Escenario {
   nombre: string
   consigna: string
   piezas: Pieza[]
+  /** Por id de carga */
+  reglas: Record<string, Regla>
+  /** Se agrega al error cuando una carga no funciona como debe */
+  pista?: string
 }
 
 /** Extremo de un cable: `pieza.borne` */
@@ -51,20 +105,25 @@ export interface Cable {
   color: ColorCable
 }
 
-/** Llave de un punto: cerrada. Combinación: el común unido al viajero 1 (`false`) o al 2 (`true`). */
+/**
+ * Por id de pieza. Llave: cerrada. Combinación: el común unido al viajero 2 (si no, al 1).
+ * Pulsador: apretado. Fotocontrol: de noche. Minutero: temporizando.
+ */
 export type EstadoLlaves = Record<string, boolean>
+
+const CLASE_I = 'El artefacto es metálico (clase I), así que su masa va al PE.'
 
 export const ESCENARIOS: Escenario[] = [
   {
     id: 'un-punto',
     nombre: 'Luz con una llave',
-    consigna:
-      'Conectá la lámpara para que la prenda y la apague la llave. El artefacto es metálico (clase I), así que su masa va al PE. Usá los colores de la norma.',
+    consigna: `Conectá la lámpara para que la prenda y la apague la llave. ${CLASE_I} Usá los colores de la norma.`,
     piezas: [
       { id: 'tablero', clase: 'tablero', nombre: 'Tablero (PIA C1)', x: 0, y: 260 },
       { id: 'lampara', clase: 'lampara', nombre: 'Boca de techo', x: 320, y: 0 },
       { id: 'llave', clase: 'llave', nombre: 'Llave', x: 320, y: 280 },
     ],
+    reglas: { lampara: { tipo: 'sigue', pieza: 'llave' } },
   },
   {
     id: 'toma',
@@ -74,18 +133,80 @@ export const ESCENARIOS: Escenario[] = [
       { id: 'tablero', clase: 'tablero', nombre: 'Tablero (PIA C2)', x: 0, y: 120 },
       { id: 'toma', clase: 'toma', nombre: 'Toma', x: 320, y: 120 },
     ],
+    reglas: {},
   },
   {
     id: 'combinacion',
     nombre: 'Luz con combinación',
-    consigna:
-      'Una luz que se prende y se apaga desde dos lugares (pasillo o escalera): cada llave tiene que cambiar el estado de la luz, sin importar cómo esté la otra. El artefacto es metálico (clase I): su masa va al PE.',
+    consigna: `Una luz que se prende y se apaga desde dos lugares (pasillo o escalera): cada llave tiene que cambiar el estado de la luz, sin importar cómo esté la otra. ${CLASE_I}`,
     piezas: [
       { id: 'tablero', clase: 'tablero', nombre: 'Tablero (PIA C1)', x: 0, y: 300 },
       { id: 'lampara', clase: 'lampara', nombre: 'Boca de techo', x: 330, y: 0 },
       { id: 'llave1', clase: 'combinacion', nombre: 'Combinación 1', x: 200, y: 320 },
       { id: 'llave2', clase: 'combinacion', nombre: 'Combinación 2', x: 460, y: 320 },
     ],
+    reglas: { lampara: { tipo: 'conmuta', piezas: ['llave1', 'llave2'] } },
+    pista:
+      'En una combinación, el común de una llave va a la fase, el de la otra a la lámpara, y los dos viajeros unen las llaves.',
+  },
+  {
+    id: 'ventilador',
+    nombre: 'Ventilador con luz',
+    consigna: `Un ventilador de techo con luz, comandados por separado desde una llave de dos efectos (dos teclas en la misma caja). La fase llega a una tecla y se puentea a la otra. El ventilador y la luz son metálicos: los dos van al PE.`,
+    piezas: [
+      { id: 'tablero', clase: 'tablero', nombre: 'Tablero (PIA C1)', x: 0, y: 300 },
+      { id: 'lampara', clase: 'lampara', nombre: 'Luz del ventilador', x: 230, y: 0 },
+      { id: 'ventilador', clase: 'ventilador', nombre: 'Motor del ventilador', x: 450, y: 0 },
+      { id: 'tecla1', clase: 'llave', nombre: 'Tecla luz', x: 230, y: 320 },
+      { id: 'tecla2', clase: 'llave', nombre: 'Tecla ventilador', x: 430, y: 320 },
+    ],
+    reglas: {
+      lampara: { tipo: 'sigue', pieza: 'tecla1' },
+      ventilador: { tipo: 'sigue', pieza: 'tecla2' },
+    },
+    pista:
+      'Cada tecla corta la fase de su carga: un retorno de la tecla de luz a la lámpara y otro de la tecla del ventilador al motor. El neutro va directo a los dos.',
+  },
+  {
+    id: 'timbre',
+    nombre: 'Timbre',
+    consigna:
+      'Un timbre que suena solo mientras se aprieta el pulsador de la puerta. El timbre es de doble aislación (clase II): no lleva PE.',
+    piezas: [
+      { id: 'tablero', clase: 'tablero', nombre: 'Tablero (PIA C1)', x: 0, y: 260 },
+      { id: 'timbre', clase: 'timbre', nombre: 'Timbre', x: 320, y: 0 },
+      { id: 'pulsador', clase: 'pulsador', nombre: 'Pulsador', x: 320, y: 280 },
+    ],
+    reglas: { timbre: { tipo: 'sigue', pieza: 'pulsador' } },
+    pista: 'El pulsador se conecta como una llave de un punto: corta la fase del timbre.',
+  },
+  {
+    id: 'fotocontrol',
+    nombre: 'Fotocontrol',
+    consigna: `Una luz exterior que se prende sola de noche. El fotocontrol necesita fase y neutro para funcionar, y su salida (S) alimenta la lámpara. ${CLASE_I}`,
+    piezas: [
+      { id: 'tablero', clase: 'tablero', nombre: 'Tablero (PIA C1)', x: 0, y: 260 },
+      { id: 'lampara', clase: 'lampara', nombre: 'Luz exterior', x: 340, y: 0 },
+      { id: 'foto', clase: 'fotocontrol', nombre: 'Fotocontrol', x: 340, y: 280 },
+    ],
+    reglas: { lampara: { tipo: 'sigue', pieza: 'foto' } },
+    pista:
+      'Fase y neutro al fotocontrol; de su salida (S) un retorno a la lámpara, y el neutro de la lámpara directo al tablero.',
+  },
+  {
+    id: 'palier',
+    nombre: 'Palier con minutero',
+    consigna: `La luz de un palier o escalera: dos pulsadores, uno en cada piso, disparan el minutero, que prende la luz un rato y la apaga solo. El minutero necesita fase y neutro; los pulsadores le mandan fase a su entrada P. ${CLASE_I}`,
+    piezas: [
+      { id: 'tablero', clase: 'tablero', nombre: 'Tablero (PIA C1)', x: 0, y: 300 },
+      { id: 'minutero', clase: 'minutero', nombre: 'Minutero', x: 230, y: 330 },
+      { id: 'lampara', clase: 'lampara', nombre: 'Luz del palier', x: 470, y: 0 },
+      { id: 'pulsador1', clase: 'pulsador', nombre: 'Pulsador PB', x: 0, y: 0 },
+      { id: 'pulsador2', clase: 'pulsador', nombre: 'Pulsador 1.er piso', x: 230, y: 0 },
+    ],
+    reglas: { lampara: { tipo: 'sigue', pieza: 'minutero' } },
+    pista:
+      'Los pulsadores van en paralelo: los dos toman la fase y los dos llevan su retorno a la entrada P del minutero. La salida S del minutero alimenta la lámpara.',
   },
 ]
 
@@ -117,28 +238,51 @@ export type Falla = 'cortocircuito' | 'fuga'
 export interface Resultado {
   /** Si hay una falla, saltó la protección y no hay tensión en ningún lado */
   falla: Falla | null
-  lamparas: Map<string, boolean>
+  /** Cargas (lámparas, ventiladores, timbres) entre fase y neutro */
+  cargas: Map<string, boolean>
   /** Tomas con fase y neutro (en cualquier orden) */
   tomas: Map<string, boolean>
+  /** Minuteros con fase en su entrada P: un pulsador los está disparando */
+  disparos: Set<string>
   /** Bornes unidos a la fase (para marcar los cables con tensión) */
   conFase: (e: Extremo) => boolean
-  /** Bornes por donde circula corriente de vuelta: el neutro, si hay alguna lámpara prendida */
+  /** Bornes por donde circula corriente de vuelta: el neutro, si hay alguna carga andando */
   conCorrienteDeNeutro: (e: Extremo) => boolean
 }
 
-function unirTodo(escenario: Escenario, cables: Cable[], llaves: EstadoLlaves) {
+function unirCables(cables: Cable[]) {
   const u = new Conjuntos()
   for (const c of cables) u.unir(c.desde, c.hasta)
+  return u
+}
+
+function unirTodo(escenario: Escenario, cables: Cable[], estado: EstadoLlaves) {
+  const u = unirCables(cables)
   for (const p of escenario.piezas) {
-    if (p.clase === 'llave' && llaves[p.id]) u.unir(extremo(p.id, '1'), extremo(p.id, '2'))
-    if (p.clase === 'combinacion')
-      u.unir(extremo(p.id, 'C'), extremo(p.id, llaves[p.id] ? '2' : '1'))
+    const [a, b] = [extremo(p.id, '1'), extremo(p.id, '2')]
+    if ((p.clase === 'llave' || p.clase === 'pulsador') && estado[p.id]) u.unir(a, b)
+    if (p.clase === 'combinacion') u.unir(extremo(p.id, 'C'), estado[p.id] ? b : a)
+  }
+  // Fotocontroles y minuteros conmutan solo si tienen fase en L y neutro en N. Su salida puede
+  // alimentar a otro equipo, así que se repite hasta que no cambie nada.
+  const activos = new Set<string>()
+  let cambio = true
+  while (cambio) {
+    cambio = false
+    for (const p of escenario.piezas) {
+      if (!EQUIPOS.includes(p.clase) || !estado[p.id] || activos.has(p.id)) continue
+      if (u.juntos(extremo(p.id, 'L'), FASE) && u.juntos(extremo(p.id, 'N'), NEUTRO)) {
+        u.unir(extremo(p.id, 'L'), extremo(p.id, 'S'))
+        activos.add(p.id)
+        cambio = true
+      }
+    }
   }
   return u
 }
 
-export function simular(escenario: Escenario, cables: Cable[], llaves: EstadoLlaves): Resultado {
-  const u = unirTodo(escenario, cables, llaves)
+export function simular(escenario: Escenario, cables: Cable[], estado: EstadoLlaves): Resultado {
+  const u = unirTodo(escenario, cables, estado)
   // Fase con neutro: corto, salta el PIA. Fase o neutro con tierra: fuga, salta el diferencial.
   const falla: Falla | null = u.juntos(FASE, NEUTRO)
     ? 'cortocircuito'
@@ -151,26 +295,50 @@ export function simular(escenario: Escenario, cables: Cable[], llaves: EstadoLla
     const n = extremo(p.id, 'N')
     return (u.juntos(l, FASE) && u.juntos(n, NEUTRO)) || (u.juntos(l, NEUTRO) && u.juntos(n, FASE))
   }
-  const de = (clase: ClasePieza) =>
-    new Map(escenario.piezas.filter((p) => p.clase === clase).map((p) => [p.id, alimentado(p)]))
+  const de = (clases: ClasePieza[]) =>
+    new Map(
+      escenario.piezas.filter((p) => clases.includes(p.clase)).map((p) => [p.id, alimentado(p)]),
+    )
+  const cargas = de(CARGAS)
+  const disparos = new Set(
+    escenario.piezas
+      .filter((p) => p.clase === 'minutero' && !falla && u.juntos(extremo(p.id, 'P'), FASE))
+      .map((p) => p.id),
+  )
+  const hayConsumo = [...cargas.values()].some(Boolean)
   return {
     falla,
-    lamparas: de('lampara'),
-    tomas: de('toma'),
+    cargas,
+    tomas: de(['toma']),
+    disparos,
     conFase: (e) => !falla && u.juntos(e, FASE),
-    conCorrienteDeNeutro: (e) =>
-      !falla &&
-      u.juntos(e, NEUTRO) &&
-      escenario.piezas.some((p) => p.clase === 'lampara' && alimentado(p)),
+    conCorrienteDeNeutro: (e) => !falla && hayConsumo && u.juntos(e, NEUTRO),
   }
 }
 
-/** Todas las posiciones posibles de las llaves del escenario. */
+/** Todos los estados posibles de las piezas que se accionan. */
 function combinaciones(escenario: Escenario): EstadoLlaves[] {
-  const llaves = escenario.piezas.filter((p) => p.clase === 'llave' || p.clase === 'combinacion')
-  return Array.from({ length: 2 ** llaves.length }, (_, n) =>
-    Object.fromEntries(llaves.map((l, i) => [l.id, Boolean(n & (1 << i))])),
+  const maniobras = escenario.piezas.filter((p) => MANIOBRAS.includes(p.clase))
+  return Array.from({ length: 2 ** maniobras.length }, (_, n) =>
+    Object.fromEntries(maniobras.map((l, i) => [l.id, Boolean(n & (1 << i))])),
   )
+}
+
+/** Cómo se dice el estado de una pieza, para los mensajes. */
+export function describirEstado(pieza: Pieza, valor: boolean): string {
+  const nombre = pieza.nombre.toLowerCase()
+  switch (pieza.clase) {
+    case 'llave':
+      return `la ${nombre} ${valor ? 'cerrada' : 'abierta'}`
+    case 'pulsador':
+      return `el ${nombre} ${valor ? 'apretado' : 'suelto'}`
+    case 'fotocontrol':
+      return valor ? 'de noche' : 'de día'
+    case 'minutero':
+      return `el minutero ${valor ? 'temporizando' : 'en reposo'}`
+    default:
+      return `${nombre} en ${valor ? '2' : '1'}`
+  }
 }
 
 export interface HallazgoConexionado {
@@ -192,18 +360,21 @@ export function verificarConexionado(escenario: Escenario, cables: Cable[]): Hal
 
   if (cables.length === 0) return [{ nivel: 'error', texto: 'Todavía no hay cables.' }]
 
-  const estados = combinaciones(escenario)
-  const resultados = estados.map((e) => ({ estado: e, r: simular(escenario, cables, e) }))
-  const lamparas = escenario.piezas.filter((p) => p.clase === 'lampara')
+  const piezas = new Map(escenario.piezas.map((p) => [p.id, p]))
+  const resultados = combinaciones(escenario).map((e) => ({
+    estado: e,
+    r: simular(escenario, cables, e),
+  }))
+  const cargas = escenario.piezas.filter((p) => CARGAS.includes(p.clase))
   const tomas = escenario.piezas.filter((p) => p.clase === 'toma')
-  const llaves = escenario.piezas.filter((p) => p.clase === 'llave' || p.clase === 'combinacion')
+  const hayManiobras = escenario.piezas.some((p) => MANIOBRAS.includes(p.clase))
 
-  // Fallas en alguna posición de las llaves
+  // Fallas en algún estado de las llaves
   const corto = resultados.find((x) => x.r.falla === 'cortocircuito')
   if (corto)
     error(
-      llaves.length && resultados.some((x) => x.r.falla !== 'cortocircuito')
-        ? 'Hay un cortocircuito (fase con neutro) en alguna posición de las llaves: al accionarlas salta el PIA.'
+      hayManiobras && resultados.some((x) => x.r.falla !== 'cortocircuito')
+        ? 'Hay un cortocircuito (fase con neutro) al accionar alguna llave o pulsador: salta el PIA.'
         : 'Hay un cortocircuito: la fase está unida al neutro y salta el PIA.',
     )
   const fuga = resultados.find((x) => x.r.falla === 'fuga')
@@ -213,48 +384,72 @@ export function verificarConexionado(escenario: Escenario, cables: Cable[]): Hal
       aea('770.14.4.5'),
     )
 
-  // Lámparas: tienen que prender y apagarse con las llaves
-  for (const l of lamparas) {
-    const prendida = resultados.map((x) => x.r.lamparas.get(l.id) ?? false)
-    if (prendida.every((p) => !p)) {
-      if (!corto && !fuga)
-        error(`${l.nombre}: la lámpara no prende en ninguna posición de las llaves.`)
-    } else if (prendida.every((p) => p)) {
-      error(`${l.nombre}: la lámpara queda siempre prendida; la llave no la comanda.`)
-    } else if (escenario.piezas.some((p) => p.clase === 'combinacion')) {
-      // Combinación: cualquier llave, desde cualquier posición, tiene que cambiar el estado
-      const falla = resultados.some(({ estado }, i) =>
-        llaves.some((ll) => {
-          const j = resultados.findIndex((y) =>
-            Object.entries(y.estado).every(([k, v]) =>
-              k === ll.id ? v !== estado[k] : v === estado[k],
-            ),
-          )
-          return prendida[i] === prendida[j]
+  // Cargas: tienen que funcionar como dice su regla
+  const sinFalla = resultados.filter((x) => !x.r.falla)
+  for (const c of cargas) {
+    const [si, no] = ANDANDO[c.clase]
+    const anda = (x: (typeof resultados)[number]) => x.r.cargas.get(c.id) ?? false
+    const regla = escenario.reglas[c.id]
+    const pista = escenario.pista ? ` ${escenario.pista}` : ''
+    if (sinFalla.length && sinFalla.every((x) => !anda(x))) {
+      error(`${c.nombre}: no queda ${si} en ningún caso.${pista}`)
+    } else if (sinFalla.length && sinFalla.every(anda) && hayManiobras) {
+      error(`${c.nombre}: queda siempre ${si}, se accione lo que se accione.${pista}`)
+    } else if (regla?.tipo === 'sigue') {
+      const pieza = piezas.get(regla.pieza)!
+      const mal = sinFalla.find((x) => anda(x) !== Boolean(x.estado[regla.pieza]))
+      if (mal) {
+        const debe = Boolean(mal.estado[regla.pieza])
+        error(
+          `${c.nombre}: con ${describirEstado(pieza, debe)} tendría que estar ${debe ? si : no} y está ${debe ? no : si}.${pista}`,
+        )
+      }
+    } else if (regla?.tipo === 'conmuta') {
+      // Cada maniobra de cualquiera de las piezas, desde cualquier estado, cambia la carga
+      const igual = (a: EstadoLlaves, b: EstadoLlaves) => Object.keys(a).every((k) => a[k] === b[k])
+      const falla = sinFalla.some((x) =>
+        regla.piezas.some((id) => {
+          const otro = sinFalla.find((y) => igual(y.estado, { ...x.estado, [id]: !x.estado[id] }))
+          return otro !== undefined && anda(otro) === anda(x)
         }),
       )
       if (falla)
         error(
-          `${l.nombre}: hay posiciones en las que una de las llaves no cambia la luz. En una combinación, cada llave tiene que prender o apagar sin importar cómo esté la otra: el común de una va a la fase, el de la otra a la lámpara, y los dos viajeros unen las llaves.`,
+          `${c.nombre}: hay posiciones en las que una de las llaves no la cambia. Cada llave tiene que prender o apagar sin importar cómo esté la otra.${pista}`,
         )
     }
 
-    // Llave en el neutro: con la luz apagada, el portalámparas sigue unido a la fase
-    const apagadaConFase = resultados.some(
+    // Llave en el neutro: con la carga parada, uno de sus bornes sigue unido a la fase
+    const paradaConFase = sinFalla.some(
       ({ r }) =>
-        !r.falla &&
-        !r.lamparas.get(l.id) &&
-        (r.conFase(extremo(l.id, 'L')) || r.conFase(extremo(l.id, 'N'))),
+        !r.cargas.get(c.id) && (r.conFase(extremo(c.id, 'L')) || r.conFase(extremo(c.id, 'N'))),
     )
-    if (prendida.some((p) => p) && apagadaConFase)
+    if (sinFalla.some(anda) && paradaConFase)
       error(
-        `${l.nombre}: la llave corta el neutro en lugar de la fase. La luz se apaga, pero el portalámparas queda con tensión y da patada al cambiar la lámpara. La llave va siempre sobre la fase.`,
+        `${c.nombre}: la maniobra corta el neutro en lugar de la fase. Se apaga, pero queda con tensión y da patada al tocarla. Llaves, pulsadores y equipos cortan siempre la fase.`,
       )
   }
 
+  // Minuteros: se disparan solo con un pulsador apretado
+  for (const m of escenario.piezas.filter((p) => p.clase === 'minutero')) {
+    const pulsadores = escenario.piezas.filter((p) => p.clase === 'pulsador')
+    const apretado = (e: EstadoLlaves) => pulsadores.some((p) => e[p.id])
+    const siempre = sinFalla.find((x) => !apretado(x.estado) && x.r.disparos.has(m.id))
+    if (siempre)
+      error(
+        `${m.nombre}: queda disparado sin apretar ningún pulsador, así que la luz no se apaga nunca. A la entrada P le llega fase solo a través de los pulsadores.`,
+      )
+    for (const p of pulsadores) {
+      const solo = sinFalla.find(
+        (x) => x.estado[p.id] && pulsadores.every((q) => q === p || !x.estado[q.id]),
+      )
+      if (solo && !solo.r.disparos.has(m.id))
+        error(`${p.nombre}: al apretarlo no le llega fase a la entrada P del minutero.`)
+    }
+  }
+
   // Desde acá, solo los cables (sin pasar por las llaves): qué está unido fijo a fase, neutro y PE
-  const u = new Conjuntos()
-  for (const c of cables) u.unir(c.desde, c.hasta)
+  const u = unirCables(cables)
 
   // Tomas: fase, neutro y tierra en su borne
   for (const t of tomas) {
@@ -269,8 +464,9 @@ export function verificarConexionado(escenario: Escenario, cables: Cable[]): Hal
       )
   }
 
-  // Protección: cada masa unida a la barra de tierra
-  for (const p of [...lamparas, ...tomas]) {
+  // Protección: cada masa con borne de tierra unida a la barra de tierra
+  for (const p of escenario.piezas) {
+    if (p.clase === 'tablero' || !BORNES[p.clase].includes('PE')) continue
     if (!u.juntos(extremo(p.id, 'PE'), TIERRA))
       error(
         p.clase === 'toma'

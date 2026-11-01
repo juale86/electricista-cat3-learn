@@ -97,7 +97,7 @@ function Conexionado() {
         variant="outline"
         value={escenarioId}
         onValueChange={(v) => v && elegirEscenario(v)}
-        className="flex w-full flex-wrap"
+        className="grid w-full grid-cols-2 sm:grid-cols-4"
         spacing={1}
       >
         {ESCENARIOS.map((e) => (
@@ -119,7 +119,7 @@ function Conexionado() {
           <p className="text-muted-foreground text-sm">
             {borrando
               ? 'Tocá un cable para sacarlo.'
-              : 'Elegí el color y uní dos bornes: arrastrando de uno a otro, o tocando uno y después el otro. Tocá las llaves para accionarlas.'}
+              : 'Elegí el color y uní dos bornes: arrastrando de uno a otro, o tocando uno y después el otro. Tocá las llaves para accionarlas; los pulsadores se mantienen apretados.'}
           </p>
         </div>
         <Colores />

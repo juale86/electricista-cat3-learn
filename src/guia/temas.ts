@@ -93,7 +93,8 @@ export const BLOQUES: Bloque[] = [
       {
         id: 'conexionado',
         titulo: 'Conexionado',
-        descripcion: 'Llave de un punto, combinación, tomas, PE en las bocas y uniones.',
+        descripcion:
+          'Llaves, combinación, timbre, ventilador, fotocontrol, palier, tomas, PE y uniones.',
         unidadesUTN: [3, 5, 6, 7],
       },
       {

@@ -19,8 +19,19 @@ import {
   type NodeProps,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { Lightbulb, LightbulbOff, Plug, Zap } from 'lucide-react'
-import { useEffect, useMemo } from 'react'
+import {
+  Bell,
+  BellRing,
+  Fan,
+  Lightbulb,
+  LightbulbOff,
+  Moon,
+  Plug,
+  Sun,
+  Timer,
+  Zap,
+} from 'lucide-react'
+import { useEffect, useMemo, useRef } from 'react'
 
 import {
   BORNES,
@@ -38,7 +49,13 @@ import { escenarioActual, useConexionado } from '@/store/conexionado'
 import { temaEfectivo, useTema } from '@/store/tema'
 
 type NodoPieza = Node<
-  { pieza: Pieza; resultado: Resultado; cerrada: boolean; onAccionar: () => void },
+  {
+    pieza: Pieza
+    resultado: Resultado
+    cerrada: boolean
+    onAccionar: () => void
+    onFijar: (valor: boolean) => void
+  },
   'pieza'
 >
 type AristaCable = Edge<{ color: Cable['color'] }, 'cable'>
@@ -50,6 +67,11 @@ const LADO: Record<ClasePieza, Position> = {
   llave: Position.Top,
   combinacion: Position.Top,
   toma: Position.Left,
+  ventilador: Position.Bottom,
+  timbre: Position.Bottom,
+  pulsador: Position.Top,
+  fotocontrol: Position.Top,
+  minutero: Position.Top,
 }
 
 function Bornes({ pieza }: { pieza: Pieza }) {
@@ -84,7 +106,8 @@ function Bornes({ pieza }: { pieza: Pieza }) {
 }
 
 function Contenido({ data }: { data: NodoPieza['data'] }) {
-  const { pieza, resultado, cerrada, onAccionar } = data
+  const { pieza, resultado, cerrada, onAccionar, onFijar } = data
+  const anda = resultado.cargas.get(pieza.id) ?? false
   switch (pieza.clase) {
     case 'tablero':
       return (
@@ -102,7 +125,7 @@ function Contenido({ data }: { data: NodoPieza['data'] }) {
         </p>
       )
     case 'lampara': {
-      const prendida = resultado.lamparas.get(pieza.id)
+      const prendida = anda
       const Icono = prendida ? Lightbulb : LightbulbOff
       return (
         <Icono
@@ -116,6 +139,81 @@ function Contenido({ data }: { data: NodoPieza['data'] }) {
         />
       )
     }
+    case 'ventilador':
+      return (
+        <Fan
+          className={cn(
+            'mx-auto size-10',
+            anda ? 'animate-spin text-sky-600 dark:text-sky-400' : 'text-muted-foreground',
+          )}
+          aria-label={anda ? 'Andando' : 'Parado'}
+        />
+      )
+    case 'timbre': {
+      const Icono = anda ? BellRing : Bell
+      return (
+        <Icono
+          className={cn(
+            'mx-auto size-9',
+            anda ? 'animate-bounce text-amber-600 dark:text-amber-400' : 'text-muted-foreground',
+          )}
+          aria-label={anda ? 'Sonando' : 'Callado'}
+        />
+      )
+    }
+    case 'pulsador':
+      // Cierra solo mientras se mantiene apretado
+      return (
+        <button
+          aria-pressed={cerrada}
+          aria-label={`Apretar ${pieza.nombre}`}
+          onPointerDown={() => onFijar(true)}
+          onPointerUp={() => onFijar(false)}
+          onPointerLeave={() => cerrada && onFijar(false)}
+          onPointerCancel={() => onFijar(false)}
+          onKeyDown={(e) => (e.key === ' ' || e.key === 'Enter') && onFijar(true)}
+          onKeyUp={() => onFijar(false)}
+          className="nodrag hover:bg-muted mx-auto flex touch-none flex-col items-center rounded-md border px-3 py-1 text-xs select-none"
+        >
+          <span
+            className={cn(
+              'my-0.5 size-6 rounded-full border-2 transition-transform',
+              cerrada
+                ? 'bg-primary border-primary scale-90'
+                : 'bg-background border-muted-foreground',
+            )}
+          />
+          {cerrada ? 'Apretado' : 'Mantené apretado'}
+        </button>
+      )
+    case 'fotocontrol':
+      return (
+        <button
+          onClick={onAccionar}
+          role="switch"
+          aria-checked={cerrada}
+          aria-label="Cambiar entre día y noche"
+          className="nodrag hover:bg-muted mx-auto flex items-center gap-1.5 rounded-md border px-3 py-1 text-xs"
+        >
+          {cerrada ? (
+            <Moon className="size-4 text-indigo-500" />
+          ) : (
+            <Sun className="size-4 text-amber-500" />
+          )}
+          {cerrada ? 'De noche' : 'De día'}
+        </button>
+      )
+    case 'minutero':
+      return (
+        <p
+          className={cn(
+            'flex items-center justify-center gap-1 text-xs',
+            cerrada ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground',
+          )}
+        >
+          <Timer className="size-4" /> {cerrada ? 'Temporizando' : 'En reposo'}
+        </p>
+      )
     case 'toma': {
       const conTension = resultado.tomas.get(pieza.id)
       return (
@@ -203,6 +301,9 @@ function CableDeColor({ id, data, style, ...props }: EdgeProps<AristaCable>) {
   )
 }
 
+/** En la realidad se regula (1 a 7 minutos); acá alcanza con unos segundos para probar */
+const DURACION_MINUTERO = 8000
+
 const TIPOS_NODO = { pieza: NodoDePieza }
 const TIPOS_ARISTA = { cable: CableDeColor }
 
@@ -213,7 +314,7 @@ function Mesa() {
   const cables = useConexionado((s) => s.cables[s.escenarioId])
   const llaves = useConexionado((s) => s.llaves)
   const borrando = useConexionado((s) => s.borrando)
-  const { conectar, quitar, accionar } = useConexionado.getState()
+  const { conectar, quitar, accionar, fijar } = useConexionado.getState()
   const tema = useTema((s) => s.tema)
 
   const escenario = escenarioActual(escenarioId)
@@ -237,11 +338,31 @@ function Mesa() {
             resultado,
             cerrada: Boolean(llaves[pieza.id]),
             onAccionar: () => accionar(pieza.id),
+            onFijar: (valor: boolean) => fijar(pieza.id, valor),
           },
         }
       }),
     )
-  }, [escenario, resultado, llaves, setNodos, accionar])
+  }, [escenario, resultado, llaves, setNodos, accionar, fijar])
+
+  // Minutero: cuando un pulsador lo dispara, temporiza unos segundos y se apaga solo
+  const disparados = [...resultado.disparos].join()
+  const temporizadores = useRef(new Map<string, number>())
+  useEffect(() => {
+    if (!disparados) return
+    for (const id of disparados.split(',')) {
+      fijar(id, true)
+      clearTimeout(temporizadores.current.get(id))
+      temporizadores.current.set(
+        id,
+        window.setTimeout(() => fijar(id, false), DURACION_MINUTERO),
+      )
+    }
+  }, [disparados, fijar])
+  useEffect(() => {
+    const t = temporizadores.current
+    return () => t.forEach((id) => clearTimeout(id))
+  }, [])
 
   const aristas = useMemo<AristaCable[]>(
     () =>

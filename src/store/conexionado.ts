@@ -26,6 +26,8 @@ interface EstadoConexionado {
   quitar: (id: string) => void
   vaciar: () => void
   accionar: (llave: string) => void
+  /** Para pulsadores (mientras se aprietan) y el minutero (mientras temporiza) */
+  fijar: (pieza: string, valor: boolean) => void
   verificar: () => void
 }
 
@@ -69,6 +71,10 @@ export const useConexionado = create<EstadoConexionado>()(
           quitar: (id) => cambiar((cs) => cs.filter((c) => c.id !== id)),
           vaciar: () => cambiar(() => []),
           accionar: (llave) => set((s) => ({ llaves: { ...s.llaves, [llave]: !s.llaves[llave] } })),
+          fijar: (pieza, valor) =>
+            set((s) =>
+              s.llaves[pieza] === valor ? s : { llaves: { ...s.llaves, [pieza]: valor } },
+            ),
           verificar: () => {
             const { escenarioId, cables } = get()
             set({

@@ -14,7 +14,7 @@ Es una web pensada para el celular: se estudia un tema en la guía y se practica
   - **Ejercicios:** cuentas rápidas, ley de Ohm, energía, preguntas de teoría, corriente desde la potencia, sección y protección, caída de tensión, grado y DPMS, y división de circuitos y tablero. Se repasa más lo que más se erra y se evita repetir los últimos ejercicios.
 - **Armá el tablero:** se eligen y ordenan las protecciones del tablero principal de una vivienda y los colores de los cables, y se verifica contra la norma con cada error citado.
 - **Circuitos en el plano:** se ubican bocas de techo, llaves y tomas en la planta de una casa, con los símbolos del curso, y se trazan los circuitos desde el tablero. Se verifican los puntos mínimos de cada ambiente y los circuitos (tipo, 15 bocas, mínimos del grado, luces con su llave). Con los circuitos trazados se arma el tablero de esa casa, y en el modo Probar se accionan las llaves y las protecciones del tablero. Además de la casa tipo, se pueden generar casas al azar, chicas, grandes o con pasillo.
-- **Conexionado:** se conectan cable por cable una luz con su llave, un tomacorriente y una luz con combinación, eligiendo el color de cada cable. Se prueba en vivo y la verificación detecta cortos, fugas, llave en el neutro, falta de PE y colores fuera de norma.
+- **Conexionado:** se conectan cable por cable una luz con su llave, un tomacorriente, una luz con combinación, un ventilador con luz, un timbre, un fotocontrol y un palier con minutero, eligiendo el color de cada cable. Se prueba en vivo y la verificación detecta cortos, fugas, llave en el neutro, falta de PE y colores fuera de norma.
 - **Modo oscuro.**
 
 ## Cómo correrlo

@@ -50,6 +50,20 @@ La luz prende cuando las dos llaves «apuntan» al mismo viajero. Por eso cualqu
   las dos combinaciones, sobre los viajeros.
 </Aviso>
 
+## Otros comandos de iluminación
+
+Todos siguen la misma regla: **lo que comanda corta la fase**, y el neutro va directo a la carga.
+
+- **Llave de dos efectos** (dos teclas en una caja), por ejemplo para un **ventilador de techo con luz**: la fase llega a una tecla y se puentea a la otra; de cada tecla sale un retorno a su carga.
+- **Timbre:** un **pulsador** cierra solo mientras se aprieta. Se conecta como una llave de un punto.
+- **Fotocontrol:** prende la luz sola de noche. Es un equipo con electrónica: necesita **fase y neutro** para funcionar, y su **salida** alimenta la lámpara.
+- **Palier o escalera con minutero:** varios **pulsadores en paralelo** mandan fase a la entrada del **minutero** (automático de escalera), que prende la luz un tiempo y la apaga solo. El minutero también necesita fase y neutro.
+
+<Aviso tipo="nota">
+  Los bornes de fotocontroles y minuteros cambian según la marca y el modelo (los hay de 3 y de 4
+  hilos). Antes de conectar, mirá el esquema del fabricante.
+</Aviso>
+
 ## Tomacorriente
 
 Tres bornes: **fase**, **neutro** y **tierra**. En la inspección inicial se verifica, en **todos** los tomas, que el PE esté conectado a su borne de tierra y que la fase, el neutro y la protección estén cada uno en el borne destinado a él <Ref aea="770.19.3.1" />.
@@ -76,5 +90,9 @@ Conectá cable por cable, accioná las llaves y verificá. El simulador detecta 
 <PracticarConexionado escenario="un-punto">Luz con una llave</PracticarConexionado>
 <PracticarConexionado escenario="toma">Tomacorriente</PracticarConexionado>
 <PracticarConexionado escenario="combinacion">Luz con combinación</PracticarConexionado>
+<PracticarConexionado escenario="ventilador">Ventilador con luz</PracticarConexionado>
+<PracticarConexionado escenario="timbre">Timbre</PracticarConexionado>
+<PracticarConexionado escenario="fotocontrol">Fotocontrol</PracticarConexionado>
+<PracticarConexionado escenario="palier">Palier con minutero</PracticarConexionado>
 
 <PracticaTema tipo="conceptos" tema="conexionado" />
