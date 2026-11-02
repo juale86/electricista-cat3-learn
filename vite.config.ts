@@ -8,6 +8,8 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // En GitHub Pages el sitio vive en /<repo>/; el workflow lo pasa en BASE_PATH
+  base: process.env.BASE_PATH ?? '/',
   plugins: [
     // El plugin del router tiene que ir antes que el de React
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
